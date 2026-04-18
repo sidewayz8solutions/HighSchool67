@@ -1,159 +1,129 @@
-# Turborepo starter
+# High School Sim
 
-This Turborepo starter is maintained by the Turborepo core team.
+A cutting-edge, cross-platform life simulation game built with **Expo SDK 54**, **React 19**, and **React Native New Architecture**. Play as a high school student, join cliques, customize your room, build relationships with AI-powered NPCs, and compete in mini-games — all from a single codebase targeting iOS, Android, and Web.
 
-## Using this example
+## Tech Stack
 
-Run the following command:
+| Layer | Technology |
+|-------|-----------|
+| Framework | Expo SDK 54 + Expo Router v4 |
+| React | React 19 with React Compiler |
+| Architecture | React Native New Architecture (Fabric + TurboModules) |
+| Monorepo | Turborepo + pnpm workspaces |
+| State | Zustand + Immer + persist middleware (local-first) |
+| Backend | Supabase (auth, DB, cloud sync) |
+| Monetization | RevenueCat (iOS/Android IAP + Stripe web) |
+| AI | OpenAI GPT-4o-mini for dynamic NPC dialogue |
+| Animations | React Native Reanimated 3 + Gesture Handler |
 
-```sh
-npx create-turbo@latest
+## Project Structure
+
+```
+highschool-sim/
+├── apps/
+│   └── game/                 # Expo app (iOS + Android + Web)
+├── packages/
+│   ├── game-engine/          # Core simulation logic & Zustand store
+│   ├── ui/                   # Shared React Native UI components
+│   ├── types/                # Shared TypeScript interfaces
+│   ├── ai/                   # OpenAI narrative generation
+│   └── config/               # Shared eslint, tsconfig
 ```
 
-## What's inside?
+## Getting Started
 
-This Turborepo includes the following packages/apps:
+```bash
+# Install dependencies
+cd highschool-sim
+pnpm install
 
-### Apps and Packages
+# Copy environment variables
+cp apps/game/.env.example apps/game/.env
+# Edit apps/game/.env with your API keys
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+# Run on web
+pnpm --filter game web
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+# Run on iOS
+pnpm --filter game ios
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+# Run on Android
+pnpm --filter game android
 ```
 
-Without global `turbo`, use your package manager:
+## Environment Setup
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+Create `apps/game/.env` with your keys:
+
+```
+# OpenAI API Key for AI-powered NPC dialogue
+EXPO_PUBLIC_OPENAI_API_KEY=sk-...
+
+# Supabase (cloud save + auth)
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+
+# RevenueCat (monetization)
+EXPO_PUBLIC_REVENUECAT_IOS_KEY=your_ios_key
+EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=your_android_key
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## Supabase Setup (Cloud Save)
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+1. Create a project at [supabase.com](https://supabase.com)
+2. Go to the SQL Editor and run the contents of `supabase-schema.sql`
+3. Copy your Project URL and Anon Key into `.env`
+4. Enable Email auth in Authentication > Providers (or use Anonymous auth)
 
-```sh
-turbo build --filter=docs
+## Game Features
+
+### Core Systems
+- **Character Creation**: Choose name and clique (Jock, Nerd, Popular, Goth, Artsy, Preppy)
+- **Daily Life Simulation**: Semester-based time progression with energy system
+- **Social System**: 5 unique NPCs with friendship and romance meters
+- **AI Dialogue**: Dynamic, context-aware conversations powered by OpenAI GPT-4o-mini
+- **Room Customization**: Interactive 8×8 grid editor — place, select, and remove furniture
+- **Dual-Currency Economy**: Points (earned) and Gems (premium)
+- **Daily Challenges**: Auto-resetting quests for bonus rewards
+
+### Story Mode (Gated Premium Chapters)
+- **The First Day** (Free) — Choose your first friend group
+- **Lunchroom Drama** (Progress-locked) — Pick your table, pass stat checks
+- **Prom Night** (Premium — 💎15) — Romance and social drama
+- **The Senior Prank** (Premium — 💎25) — Rebellion-required heist
+- **Graduation Day** (Season Pass) — The finale
+
+### Mini-Games
+| Game | Stat Boost | Mechanic |
+|------|-----------|----------|
+| Math Blitz | Academics | Rapid math quiz |
+| Football Toss | Athletics | Gesture flick physics |
+| Dance Battle | Popularity | Rhythm tap game |
+| Art Studio | Creativity | Color matching |
+| Memory Match | Academics | Card matching |
+
+### Cloud Save
+- **Anonymous auth** — play immediately, no signup required
+- **Email auth** — full account with cross-device sync
+- **Auto-sync** — saves every 60 seconds when enabled
+- **Manual sync** — save/load on demand from Profile tab
+
+### Monetization
+- **Gems Packs**: $0.99 (100), $4.99 (550), $9.99 (1200)
+- **Starter Pack**: $2.99 one-time
+- **Season Pass**: Basic ($4.99/mo), VIP ($9.99/mo), Lifetime ($49.99)
+- RevenueCat SDK integrated for real iOS/Android purchases
+
+## Deployment
+
+```bash
+# Build web app
+pnpm --filter game export:web
+
+# Build native apps via EAS
+pnpm --filter game eas build --platform all
 ```
 
-Without global `turbo`:
+## License
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+MIT

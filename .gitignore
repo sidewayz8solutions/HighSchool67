@@ -1,38 +1,82 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # Dependencies
-node_modules
+node_modules/
 .pnp
 .pnp.js
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
 
 # Local env files
 .env
 .env.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
 
 # Testing
-coverage
+coverage/
+.nyc_output/
 
-# Turbo
-.turbo
+# Build & Cache
+.turbo/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
 
 # Vercel
 .vercel
 
-# Build Outputs
-.next/
-out/
-build
-dist
+# Expo & React Native
+.expo/
+.expo-shared/
+node_modules/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
 
+# IDE & Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
 
-# Debug
+# OS
+*.pem
+.thumbs.db
+
+# Dependencies
+node_modules
+
+# Supabase local development
+.supabase/
+
+# Turbo
+.turbo
+
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
 # Misc
-.DS_Store
-*.pem
+*.bak
+*.tmp
+.cache/
