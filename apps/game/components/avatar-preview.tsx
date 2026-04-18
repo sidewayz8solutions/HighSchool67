@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@repo/ui';
 import type { AvatarConfig } from '@repo/types';
 import { createAvatar } from '@dicebear/core';
+import type { Options } from '@dicebear/core';
 import * as adventurer from '@dicebear/adventurer';
 
 interface AvatarPreviewProps {
@@ -23,7 +24,7 @@ const HAIR_MAP: Record<number, string[]> = {
   7: ['short11'], // Mohawk
 };
 
-const GLASSES_MAP: Record<number, string[]> = {
+const GLASSES_MAP: Record<number, ('variant01' | 'variant03' | 'variant02' | 'variant04' | 'variant05')[]> = {
   1: ['variant01'], // Glasses
   2: ['variant03'], // Sunglasses
 };
@@ -39,13 +40,13 @@ export function AvatarPreview({ config, size = 180 }: AvatarPreviewProps) {
       const isBald = config.hairStyle === 4;
       const glasses = GLASSES_MAP[config.accessory];
 
-      const options = {
+      const options: Partial<Options> = {
         size: size * 2,
         hair,
-        hairColor: hexToDiceBear(config.hairColor),
-        skinColor: hexToDiceBear(config.skinTone),
+        hairColor: hexToDiceBear(config.hairColor) as any,
+        skinColor: hexToDiceBear(config.skinTone) as any,
         hairProbability: isBald ? 0 : 100,
-        glasses,
+        glasses: glasses as any,
         glassesProbability: glasses ? 100 : 0,
         seed: `${config.gender}-${config.skinTone}-${config.hairStyle}-${config.hairColor}-${config.eyeColor}-${config.outfit}-${config.accessory}`,
       };
