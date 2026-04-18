@@ -42,12 +42,10 @@ export function AvatarPreview({ config, size = 180 }: AvatarPreviewProps) {
 
       const options: Partial<Options> = {
         size: size * 2,
-        hair,
-        hairColor: hexToDiceBear(config.hairColor) as any,
-        skinColor: hexToDiceBear(config.skinTone) as any,
-        hairProbability: isBald ? 0 : 100,
-        glasses: glasses as any,
-        glassesProbability: glasses ? 100 : 0,
+        hair: isBald ? [] : hair,
+        hairColor: hexToDiceBear(config.hairColor),
+        skinColor: hexToDiceBear(config.skinTone),
+        glasses: glasses || [],
         seed: `${config.gender}-${config.skinTone}-${config.hairStyle}-${config.hairColor}-${config.eyeColor}-${config.outfit}-${config.accessory}`,
       };
 
