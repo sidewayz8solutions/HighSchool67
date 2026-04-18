@@ -13,7 +13,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'High School Sim', headerShown: false }} />
+        <Stack.Screen name="index" options={{ title: 'HIGH SCHOOL 67', headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="light" />

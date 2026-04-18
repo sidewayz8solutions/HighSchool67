@@ -71,7 +71,7 @@ export default function WelcomeScreen() {
     <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn} style={styles.header}>
-          <Text style={styles.title}>High School Sim</Text>
+          <Text style={styles.title}>HIGH SCHOOL 67</Text>
           <Text style={styles.subtitle}>Create your legend</Text>
         </Animated.View>
 

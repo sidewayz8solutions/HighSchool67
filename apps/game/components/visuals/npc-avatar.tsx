@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { SvgAvatar } from './svg-avatar';
+import { SvgXml } from 'react-native-svg';
+import { createAvatar } from '@dicebear/core';
+import * as adventurer from '@dicebear/adventurer';
 
 interface NpcAvatarProps {
   seed: string;
@@ -11,6 +14,10 @@ interface NpcAvatarProps {
   borderColor?: string;
 }
 
+function hexToDiceBear(hex: string): string[] {
+  return [hex.replace('#', '')];
+}
+
 export function NpcAvatar({
   seed,
   size = 64,
@@ -20,8 +27,24 @@ export function NpcAvatar({
   glasses,
   borderColor = 'rgba(255,255,255,0.15)',
 }: NpcAvatarProps) {
-  const hairStyle = hair[0];
-  const accessory = glasses ? 1 : 0;
+  const svgString = useMemo(() => {
+    try {
+      const avatar = createAvatar(adventurer, {
+        size: size * 2,
+        seed,
+        hair,
+        hairColor: hexToDiceBear(hairColor),
+        skinColor: hexToDiceBear(skinColor),
+        glasses,
+        glassesProbability: glasses ? 100 : 0,
+        hairProbability: 100,
+      });
+      return avatar.toString();
+    } catch (e) {
+      console.warn('NPC avatar generation failed:', e);
+      return null;
+    }
+  }, [seed, size, hair, hairColor, skinColor, glasses]);
 
   return (
     <View
@@ -35,17 +58,13 @@ export function NpcAvatar({
         },
       ]}
     >
-      <View style={{ width: size * 0.88, height: size * 0.88 }}>
-        <SvgAvatar
-          skinTone={skinColor}
-          hairStyle={hairStyle}
-          hairColor={hairColor}
-          eyeColor="#3b6e28"
-          outfit={0}
-          accessory={accessory}
-          size={size * 0.88}
-        />
-      </View>
+      {svgString ? (
+        <View style={{ width: size * 0.88, height: size * 0.88, borderRadius: (size * 0.88) / 2, overflow: 'hidden' }}>
+          <SvgXml xml={svgString} width={size * 0.88} height={size * 0.88} />
+        </View>
+      ) : (
+        <View style={[styles.fallback, { width: size * 0.6, height: size * 0.6, borderRadius: (size * 0.6) / 2 }]} />
+      )}
     </View>
   );
 }
@@ -61,5 +80,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 6,
+  },
+  fallback: {
+    backgroundColor: '#334155',
   },
 });
