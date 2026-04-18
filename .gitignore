@@ -69,6 +69,9 @@ node_modules
 # Turbo
 .turbo
 
+# Evolver
+apps/game/evolver/
+
 # Debug logs
 npm-debug.log*
 yarn-debug.log*
