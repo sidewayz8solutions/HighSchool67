@@ -5,7 +5,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@repo/ui';
 import type { AvatarConfig } from '@repo/types';
 import { createAvatar } from '@dicebear/core';
-import type { Options } from '@dicebear/core';
 import * as adventurer from '@dicebear/adventurer';
 
 interface AvatarPreviewProps {
@@ -40,7 +39,7 @@ export function AvatarPreview({ config, size = 180 }: AvatarPreviewProps) {
       const isBald = config.hairStyle === 4;
       const glasses = GLASSES_MAP[config.accessory];
 
-      const options: Partial<Options> = {
+      const options = {
         size: size * 2,
         hair: isBald ? [] : hair,
         hairColor: hexToDiceBear(config.hairColor),
