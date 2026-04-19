@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Card, Button, colors, spacing } from '@repo/ui';
+import { Card, Button, colors, spacing, radii } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import { SCHEDULED_EVENTS, canParticipateInEvent, getEventConsequences } from '@repo/game-engine/world-events';
 import { formatGameDate } from '@repo/game-engine/event-calendar';
