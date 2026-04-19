@@ -17,6 +17,11 @@ const CHAPTER_ICONS: Record<string, { gradient: [string, string]; letter: string
   'ch8-summer-job': { gradient: ['#3b82f6', '#1d4ed8'], letter: '8' },
   'ch9-the-breakup': { gradient: ['#ec4899', '#be185d'], letter: '9' },
   'ch10-senior-trip': { gradient: ['#22c55e', '#15803d'], letter: '10' },
+  'ch11-exchange-student': { gradient: ['#22c55e', '#15803d'], letter: '11' },
+  'ch12-the-scandal': { gradient: ['#64748b', '#475569'], letter: '12' },
+  'ch13-sports-championship': { gradient: ['#ef4444', '#b91c1c'], letter: '13' },
+  'ch14-talent-show': { gradient: ['#a855f7', '#7c3aed'], letter: '14' },
+  'ch15-the-election': { gradient: ['#f59e0b', '#d97706'], letter: '15' },
 };
 
 export default function StoryScreen() {

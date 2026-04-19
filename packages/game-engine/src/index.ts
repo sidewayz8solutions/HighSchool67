@@ -18,8 +18,60 @@ import type {
   DailyChallenge,
   Clique,
   StoryChapter,
+  SkillTree,
+  SkillTreeId,
+  ActiveAbility,
+  CareerPath,
+  LoginStreak,
+  AtmosphereState,
+  CalendarEntry,
+  ScheduledEvent,
+  SeasonalTheme,
 } from '@repo/types';
 import { STORY_CHAPTERS, canUnlockChapter, getCurrentScene } from './story';
+import {
+  SKILL_TREES,
+  ACTIVE_ABILITIES,
+  getAllNodes,
+  canPurchaseNode,
+  purchaseNode,
+  getActiveAbilities,
+  applySkillEffects,
+  useActiveAbility,
+  getSkillTreeProgress,
+  getSkillPointsAvailable,
+  tickAbilityCooldowns,
+} from './skill-tree';
+import {
+  CAREER_PATHS,
+  getAvailableCareers,
+  getCurrentCareer,
+  checkMilestoneCompletion,
+  getCareerRecommendation,
+} from './career-system';
+import {
+  getDefaultLoginStreak,
+  processDailyLogin,
+  claimDailyReward,
+  isStreakAtRisk,
+  useStreakProtection,
+  getMonthlyBonus,
+  getStreakStatus,
+} from './daily-login';
+import {
+  getDefaultAtmosphere,
+  shiftAtmosphere,
+  decayAtmosphere,
+  applySeasonalModifiers,
+} from './atmosphere';
+import {
+  getEventsForDay,
+  getCurrentSeasonalTheme,
+  processEventChoice,
+  generateRandomCrisis,
+  getCalendarForSemester,
+  getUpcomingEvents as getUpcomingEventsEngine,
+} from './world-events';
 
 const MAX_STAT = 100;
 const MAX_ENERGY = 100;
@@ -52,6 +104,11 @@ export const DEFAULT_NPCS: NPC[] = [
   { id: '13', name: 'Jordan', clique: 'jock', avatar: '🏊', visualConfig: npcVisual('jordan-jock', { hair: ['short17'], hairColor: '#85c2c6', skinColor: '#f2d3b1' }), relationship: 5, romance: 0, unlocked: false, bio: 'Swim team star. Quiet, focused, unexpectedly kind.', personality: 'chill', schedule: { morning: 'Pool', lunch: 'Cafeteria', afternoon: 'Swim practice', evening: 'Beach', night: 'Dorm' } },
   { id: '14', name: 'Sasha', clique: 'popular', avatar: '📱', visualConfig: npcVisual('sasha-popular', { hair: ['long06'], hairColor: '#592454', skinColor: '#ecad80' }), relationship: 5, romance: 0, unlocked: false, bio: 'Social media queen. 50k followers. Allergic to sincerity.', personality: 'dramatic', schedule: { morning: 'Cafeteria', lunch: 'Courtyard', afternoon: 'Mall', evening: 'Party', night: 'Scrolling' } },
   { id: '15', name: 'Kai', clique: 'nerd', avatar: '🎮', visualConfig: npcVisual('kai-nerd', { hair: ['long21'], hairColor: '#dba3be', skinColor: '#f2d3b1' }), relationship: 5, romance: 0, unlocked: false, bio: 'Esports legend. Streams under a secret alias. Knows everyone\'s secrets.', personality: 'mysterious', schedule: { morning: 'Computer Lab', lunch: 'Cafeteria', afternoon: 'Gaming Club', evening: 'Streaming', night: 'Online' } },
+  { id: '16', name: 'Liam', clique: 'artsy', avatar: '🌍', visualConfig: npcVisual('liam-exchange', { hair: ['short09'], hairColor: '#4a6741', skinColor: '#f5d0b5' }), relationship: 0, romance: 0, unlocked: false, bio: 'An exchange student from Ireland. Charming accent, mysterious past, and a talent for photography. Everyone wants to know his story.', personality: 'mysterious', schedule: { morning: 'Language Lab', lunch: 'Courtyard', afternoon: 'Photography Club', evening: 'Exploring town', night: 'Writing letters home' } },
+  { id: '17', name: 'Olivia', clique: 'preppy', avatar: '📰', visualConfig: npcVisual('olivia-reporter', { hair: ['long08'], hairColor: '#8d5524', skinColor: '#e8b89a' }), relationship: 5, romance: 0, unlocked: true, bio: 'Editor of the school paper. Nothing happens at Westfield without her knowing. She might write about you — for better or worse.', personality: 'ambitious', schedule: { morning: 'Newsroom', lunch: 'Interviewing students', afternoon: 'Yearbook office', evening: 'Writing articles', night: 'Chasing leads' } },
+  { id: '18', name: 'Noah', clique: 'jock', avatar: '🏋️', visualConfig: npcVisual('noah-coach', { hair: ['short15'], hairColor: '#0e0e0e', skinColor: '#d4a373' }), relationship: 5, romance: 0, unlocked: false, bio: 'The coach\'s son. Quiet, focused, and surprisingly kind. He\'s not just playing sports — he\'s studying them.', personality: 'chill', schedule: { morning: 'Training', lunch: 'Cafeteria', afternoon: 'Practice', evening: 'Studying game tape', night: 'Early to bed' } },
+  { id: '19', name: 'Emma', clique: 'popular', avatar: '💋', visualConfig: npcVisual('emma-transfer', { hair: ['long12'], hairColor: '#cb6820', skinColor: '#f2d3b1' }), relationship: 0, romance: 0, unlocked: false, bio: 'Transferred from a rival school mid-year. Gorgeous, confident, and already shaking up the social hierarchy. Is she friend or rival?', personality: 'dramatic', schedule: { morning: 'Guidance office', lunch: 'Popular table', afternoon: 'Cheer practice', evening: 'Mall', night: 'Social media' } },
+  { id: '20', name: 'Aiden', clique: 'nerd', avatar: '💻', visualConfig: npcVisual('aiden-billionaire', { hair: ['short07'], hairColor: '#ac6511', skinColor: '#f5d0b5' }), relationship: 0, romance: 0, unlocked: false, bio: 'His father runs a tech empire, but Aiden just wants to build robots in peace. Secretly generous. Publicly tsundere.', personality: 'tsundere', schedule: { morning: 'Private tutoring', lunch: 'Library', afternoon: 'Robotics Lab', evening: 'Hacking', night: 'Online' } },
 ];
 
 export const DEFAULT_RIVALS: Rival[] = [
@@ -225,7 +282,39 @@ export function createDefaultPlayer(name: string, clique: Clique, avatarConfig?:
   };
 }
 
+// ─── Skill Tree Helpers ─────────────────────────────────────────────
+
+function buildSkillTrees(): Record<SkillTreeId, SkillTree> {
+  const record = {} as Record<SkillTreeId, SkillTree>;
+  for (const tree of SKILL_TREES) {
+    record[tree.id] = tree;
+  }
+  return record;
+}
+
+// ─── Extended Store Interface ───────────────────────────────────────
+
 interface GameStore extends GameState {
+  hasHydrated: boolean;
+
+  // Skill Tree
+  skillTrees: Record<SkillTreeId, SkillTree>;
+  purchasedSkillNodes: string[];
+  activeAbilities: ActiveAbility[];
+
+  // Career
+  careerPaths: CareerPath[];
+  currentCareerId: string | undefined;
+  careerMilestonesCompleted: string[];
+
+  // Login Streak
+  loginStreak: LoginStreak;
+
+  // Audio
+  audioEnabled: boolean;
+  audioVolumes: { master: number; music: number; sfx: number };
+
+  // ─── Existing Actions ────────────────────────────────────────────
   initGame: (name: string, clique: Clique, avatarConfig?: Partial<any>) => void;
   advanceTime: () => { event: RandomEvent | null; unlockedNpcs: NPC[] };
   modifyStats: (changes: Partial<Stats>) => void;
@@ -240,17 +329,53 @@ interface GameStore extends GameState {
   updateChallenge: (challengeId: string, value: number) => void;
   resetDailyChallenges: () => void;
   refillEnergy: (amount?: number) => void;
-  hasHydrated: boolean;
+
   // Story
   unlockChapter: (chapterId: string, hasSeasonPass?: boolean) => boolean;
   makeStoryChoice: (chapterId: string, choiceId: string, sceneId: string) => void;
   resetChapter: (chapterId: string) => void;
   getChapterStatus: (chapter: StoryChapter, hasSeasonPass?: boolean) => { unlocked: boolean; reason?: string; completed: boolean };
+
   // Rivals
   increaseHostility: (rivalId: string, amount: number) => void;
   decreaseHostility: (rivalId: string, amount: number) => void;
+
   // Achievements
   checkAchievements: () => Achievement[];
+
+  // ─── New Actions ─────────────────────────────────────────────────
+
+  // Skill Tree
+  purchaseSkillNode: (nodeId: string, treeId: SkillTreeId) => { success: boolean; message: string };
+  useActiveAbility: (abilityId: string) => { success: boolean; message: string };
+  tickCooldowns: () => void;
+
+  // Career
+  selectCareer: (careerId: string) => void;
+  checkCareerMilestones: () => { newlyCompleted: string[]; rewards: Partial<Currency> };
+  getCareerRecommendation: () => CareerPath | null;
+
+  // Daily Login
+  processDailyLogin: () => { reward: import('@repo/types').DailyReward | null; streakContinued: boolean; isNewStreak: boolean };
+  claimDailyReward: (day: number) => { success: boolean; reward: import('@repo/types').DailyReward | null };
+  useStreakProtection: () => boolean;
+
+  // Audio
+  setAudioEnabled: (enabled: boolean) => void;
+  setAudioVolume: (channel: 'master' | 'music' | 'sfx', volume: number) => void;
+
+  // Atmosphere & Events
+  atmosphere: AtmosphereState;
+  calendar: CalendarEntry[];
+  activeEvents: ScheduledEvent[];
+  eventHistory: Array<{ eventId: string; choiceId: string; day: number }>;
+  currentSeasonalTheme?: SeasonalTheme;
+  advanceToEvent: (eventId: string) => void;
+  makeEventChoice: (eventId: string, choiceId: string) => void;
+  getUpcomingEvents: (daysAhead: number) => CalendarEntry[];
+  getCurrentAtmosphere: () => AtmosphereState;
+  triggerCrisisEvent: () => ScheduledEvent | null;
+  applySeasonalTheme: () => void;
 }
 
 export { STORY_CHAPTERS, canUnlockChapter, getCurrentScene };
@@ -268,7 +393,6 @@ function generateDailyChallenges(): DailyChallenge[] {
     { title: 'Speed Demon', description: 'Score 400+ in Dance Battle', reward: { points: 55, gems: 2 }, type: 'minigame' as const, targetValue: 400 },
     { title: 'Memory Master', description: 'Complete Memory Match under 30s', reward: { points: 50, gems: 1 }, type: 'minigame' as const, targetValue: 1 },
   ];
-  // Shuffle and pick 4
   const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 4);
   return shuffled.map((c, i) => ({
     id: `c-${Date.now()}-${i}`,
@@ -293,6 +417,7 @@ function pickRandomEvent(period: Period, semester: number): RandomEvent | null {
 export const useGameStore = create<GameStore>()(
   persist(
     immer((set, get) => ({
+      // ─── State ──────────────────────────────────────────────────
       player: createDefaultPlayer('Player', 'nerd'),
       progress: { semester: 1, day: 1, period: 'morning' },
       npcs: DEFAULT_NPCS.slice(0, 5),
@@ -307,6 +432,25 @@ export const useGameStore = create<GameStore>()(
         currentSceneByChapter: {},
         choiceHistory: {},
       },
+
+      // Skill Tree
+      skillTrees: buildSkillTrees(),
+      purchasedSkillNodes: [],
+      activeAbilities: ACTIVE_ABILITIES.map((a) => ({ ...a })),
+
+      // Career
+      careerPaths: CAREER_PATHS.map((c) => ({ ...c, milestones: c.milestones.map((m) => ({ ...m })) })),
+      currentCareerId: undefined,
+      careerMilestonesCompleted: [],
+
+      // Login Streak
+      loginStreak: getDefaultLoginStreak(),
+
+      // Audio
+      audioEnabled: true,
+      audioVolumes: { master: 0.8, music: 0.7, sfx: 1.0 },
+
+      // ─── Actions ────────────────────────────────────────────────
 
       initGame: (name, clique, avatarConfig) => {
         set((state) => {
@@ -323,6 +467,18 @@ export const useGameStore = create<GameStore>()(
             currentSceneByChapter: {},
             choiceHistory: {},
           };
+          state.purchasedSkillNodes = [];
+          state.activeAbilities = ACTIVE_ABILITIES.map((a) => ({ ...a, unlocked: false, currentCooldown: 0 }));
+          state.careerPaths = CAREER_PATHS.map((c) => ({
+            ...c,
+            milestones: c.milestones.map((m) => ({ ...m, completed: false })),
+            currentMilestone: 0,
+          }));
+          state.currentCareerId = undefined;
+          state.careerMilestonesCompleted = [];
+          state.loginStreak = getDefaultLoginStreak();
+          state.audioEnabled = true;
+          state.audioVolumes = { master: 0.8, music: 0.7, sfx: 1.0 };
         });
       },
 
@@ -346,10 +502,8 @@ export const useGameStore = create<GameStore>()(
           }
           state.lastPlayedAt = new Date().toISOString();
 
-          // Random event
           event = pickRandomEvent(state.progress.period, state.progress.semester);
 
-          // Unlock NPCs based on progress
           const unlockRequirements: Record<string, { semester?: number; day?: number; npcFriendship?: { id: string; min: number } }> = {
             '6': { semester: 1, day: 3 },
             '7': { semester: 1, day: 5, npcFriendship: { id: '2', min: 20 } },
@@ -361,6 +515,10 @@ export const useGameStore = create<GameStore>()(
             '13': { semester: 3, day: 1 },
             '14': { semester: 3, day: 5, npcFriendship: { id: '2', min: 40 } },
             '15': { semester: 3, day: 10, npcFriendship: { id: '3', min: 40 } },
+            '16': { semester: 2, day: 1 },
+            '18': { semester: 1, day: 7, npcFriendship: { id: '1', min: 30 } },
+            '19': { semester: 3, day: 1 },
+            '20': { semester: 2, day: 5 },
           };
 
           unlockedNpcs = [];
@@ -377,6 +535,9 @@ export const useGameStore = create<GameStore>()(
             npc.unlocked = true;
             unlockedNpcs.push(npc);
           });
+
+          // Tick ability cooldowns when period advances
+          state.activeAbilities = tickAbilityCooldowns(state.activeAbilities);
         });
 
         return { event, unlockedNpcs };
@@ -632,6 +793,203 @@ export const useGameStore = create<GameStore>()(
 
         return newlyUnlocked;
       },
+
+      // ─── Skill Tree Actions ─────────────────────────────────────
+
+      purchaseSkillNode: (nodeId, treeId) => {
+        const state = get();
+        const allNodes = getAllNodes();
+        const node = allNodes.find((n) => n.id === nodeId && n.treeId === treeId);
+
+        if (!node) {
+          return { success: false, message: 'Skill node not found' };
+        }
+
+        const canPurchaseResult = canPurchaseNode(
+          node,
+          state.purchasedSkillNodes,
+          state.player,
+        );
+
+        if (!canPurchaseResult) {
+          return { success: false, message: 'Requirements not met for this skill' };
+        }
+
+        const availablePoints = getSkillPointsAvailable(state.player);
+        if (availablePoints < node.cost) {
+          return { success: false, message: `Need ${node.cost} skill points (have ${availablePoints})` };
+        }
+
+        set((s) => {
+          s.purchasedSkillNodes.push(nodeId);
+          const tree = s.skillTrees[treeId];
+          if (tree) {
+            const treeNode = tree.nodes.find((n) => n.id === nodeId);
+            if (treeNode) {
+              treeNode.purchased = true;
+            }
+          }
+          if (node.effects.statBonus) {
+            for (const [key, val] of Object.entries(node.effects.statBonus)) {
+              if (val && key in s.player.stats) {
+                (s.player.stats as any)[key] = Math.min(MAX_STAT, (s.player.stats as any)[key] + val);
+              }
+            }
+          }
+          s.activeAbilities = getActiveAbilities(s.purchasedSkillNodes);
+        });
+
+        return { success: true, message: `Unlocked: ${node.name}` };
+      },
+
+      useActiveAbility: (abilityId) => {
+        const state = get();
+        const result = useActiveAbility(
+          abilityId,
+          state.purchasedSkillNodes,
+          state.activeAbilities,
+        );
+
+        if (result.success) {
+          set((s) => {
+            s.activeAbilities = result.updatedAbilities;
+          });
+        }
+
+        return { success: result.success, message: result.message };
+      },
+
+      tickCooldowns: () => {
+        set((state) => {
+          state.activeAbilities = tickAbilityCooldowns(state.activeAbilities);
+        });
+      },
+
+      // ─── Career Actions ───────────────────────────────────────────
+
+      selectCareer: (careerId) => {
+        set((state) => {
+          state.currentCareerId = careerId;
+          const career = state.careerPaths.find((c) => c.id === careerId);
+          if (career) {
+            career.currentMilestone = 0;
+            career.milestones.forEach((m) => {
+              m.completed = false;
+              delete m.completedAt;
+            });
+          }
+          state.careerMilestonesCompleted = [];
+        });
+      },
+
+      checkCareerMilestones: () => {
+        const state = get();
+        if (!state.currentCareerId) {
+          return { newlyCompleted: [], rewards: { points: 0, gems: 0 } };
+        }
+
+        const career = state.careerPaths.find((c) => c.id === state.currentCareerId);
+        if (!career) return { newlyCompleted: [], rewards: { points: 0, gems: 0 } };
+
+        const { updatedCareer, newlyCompleted } = checkMilestoneCompletion(career, state.player);
+        const totalRewards = { points: 0, gems: 0 };
+
+        for (const mc of newlyCompleted) {
+          if (mc.reward.currency?.points) totalRewards.points += mc.reward.currency.points;
+          if (mc.reward.currency?.gems) totalRewards.gems += mc.reward.currency.gems;
+        }
+
+        if (newlyCompleted.length > 0) {
+          set((s) => {
+            const idx = s.careerPaths.findIndex((c) => c.id === state.currentCareerId);
+            if (idx >= 0) {
+              s.careerPaths[idx] = updatedCareer;
+            }
+            for (const mc of newlyCompleted) {
+              if (!s.careerMilestonesCompleted.includes(mc.id)) {
+                s.careerMilestonesCompleted.push(mc.id);
+              }
+              if (mc.reward.currency?.points) s.player.currency.points += mc.reward.currency.points;
+              if (mc.reward.currency?.gems) s.player.currency.gems += mc.reward.currency.gems;
+            }
+          });
+        }
+
+        return { newlyCompleted: newlyCompleted.map((m) => m.id), rewards: totalRewards };
+      },
+
+      getCareerRecommendation: () => {
+        const state = get();
+        return getCareerRecommendation(state.player);
+      },
+
+      // ─── Daily Login Actions ─────────────────────────────────────
+
+      processDailyLogin: () => {
+        const state = get();
+        const today = new Date().toISOString();
+
+        const result = processDailyLogin(state.loginStreak, today);
+
+        set((s) => {
+          s.loginStreak = result.updatedStreak;
+        });
+
+        return {
+          reward: result.reward,
+          streakContinued: result.streakContinued,
+          isNewStreak: result.isNewStreak,
+        };
+      },
+
+      claimDailyReward: (day) => {
+        const state = get();
+        const result = claimDailyReward(state.loginStreak, day);
+
+        if (!result.reward) {
+          return { success: false, reward: null };
+        }
+
+        set((s) => {
+          s.loginStreak = result.updatedStreak;
+          if (result.reward.reward.points) {
+            s.player.currency.points += result.reward.reward.points;
+          }
+          if (result.reward.reward.gems) {
+            s.player.currency.gems += result.reward.reward.gems;
+          }
+          if (result.reward.reward.energy) {
+            s.player.stats.energy = Math.min(MAX_ENERGY, s.player.stats.energy + result.reward.reward.energy);
+          }
+        });
+
+        return { success: true, reward: result.reward };
+      },
+
+      useStreakProtection: () => {
+        const state = get();
+        if (state.loginStreak.streakProtectionUsed) return false;
+
+        const updated = useStreakProtection(state.loginStreak);
+        set((s) => {
+          s.loginStreak = updated;
+        });
+        return true;
+      },
+
+      // ─── Audio Actions ────────────────────────────────────────────
+
+      setAudioEnabled: (enabled) => {
+        set((state) => {
+          state.audioEnabled = enabled;
+        });
+      },
+
+      setAudioVolume: (channel, volume) => {
+        set((state) => {
+          state.audioVolumes[channel] = Math.max(0, Math.min(1, volume));
+        });
+      },
     })),
     {
       name: 'highschool-sim-storage-v2',
@@ -644,3 +1002,87 @@ export const useGameStore = create<GameStore>()(
     }
   )
 );
+
+// ─── Re-exports ─────────────────────────────────────────────────────
+
+export {
+  SKILL_TREES,
+  ACTIVE_ABILITIES,
+  CAREER_PATHS,
+  getAllNodes,
+  canPurchaseNode,
+  getActiveAbilities,
+  applySkillEffects,
+  getSkillTreeProgress,
+  getSkillPointsAvailable,
+  getAvailableCareers,
+  getCurrentCareer,
+  checkMilestoneCompletion,
+  getCareerRecommendation,
+  getDefaultLoginStreak,
+  processDailyLogin,
+  claimDailyReward as claimDailyRewardUtil,
+  isStreakAtRisk,
+  useStreakProtection as useStreakProtectionUtil,
+  getMonthlyBonus,
+  getStreakStatus,
+};
+
+// ─── Social & Tournament Exports ────────────────────────────────────
+
+export type {
+  Friend,
+  GiftRecord,
+  StatComparison,
+} from './friend-system';
+
+export {
+  generateFriendCode,
+  addFriendByCode,
+  removeFriend,
+  visitFriendRoom,
+  canSendGift,
+  getRemainingGifts,
+  sendGift,
+  compareStats,
+  MOCK_FRIENDS,
+  getMockPlayerFromFriend,
+} from './friend-system';
+
+export type {
+  SocialFeedItem,
+  SocialComment,
+  FeedItemType,
+} from './social-feed';
+
+export {
+  generateFeedItems,
+  addFeedItem,
+  likeFeedItem,
+  addComment,
+  getFeedTypeEmoji,
+  getFeedTypeColor,
+  getFeedTypeLabel,
+  MOCK_FEED_ITEMS,
+} from './social-feed';
+
+export type {
+  LeaderboardEntry,
+  TournamentReward,
+  Tournament,
+  TournamentStatus,
+} from './tournament';
+
+export {
+  GAME_TYPES,
+  LEADERBOARD_NPCS,
+  getWeeklyTournament,
+  submitScore,
+  getPlayerRank,
+  getRewardsForRank,
+  getActiveTournaments,
+  getLeaderboard,
+  formatCountdown,
+  getTournamentHistory,
+} from './tournament';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

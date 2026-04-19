@@ -1,3 +1,12 @@
 export { NpcAvatar } from './npc-avatar';
 export { CurrencyBadge } from './currency-badge';
 export { Particles } from './particles';
+export { EnhancedParticles } from './enhanced-particles';
+export type { ParticleType } from './enhanced-particles';
+export { WeatherOverlay } from './weather-overlay';
+export type { WeatherType, Intensity } from './weather-overlay';
+export { AnimatedPortrait } from './animated-portrait';
+export type { EmotionType } from './animated-portrait';
+export { FloatingText, FloatingTextManager } from './floating-text';
+export { ScreenTransition } from './screen-transition';
+export type { TransitionType } from './screen-transition';

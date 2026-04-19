@@ -321,6 +321,274 @@ export const STORY_CHAPTERS: StoryChapter[] = [
       },
     ],
   },
+  {
+    id: 'ch11-exchange-student',
+    title: 'The Exchange Student',
+    description: 'A mysterious stranger from overseas arrives. Will you be their guide, their rival, or something more?',
+    semester: 2,
+    episode: 6,
+    lockType: 'progress',
+    requiredSemester: 2,
+    thumbnail: '🌍',
+    scenes: [
+      {
+        id: 's1',
+        text: 'The morning announcements crackle to life. "Please welcome Liam O\'Brien, joining us from Dublin, Ireland." A hush falls over the classroom as the door opens. A boy with tousled greenish-brown hair and an easy smile steps in, camera hanging from his neck like an extra limb. His eyes scan the room and lock on yours with unsettling intensity.',
+        choices: [
+          { id: 'c1', text: 'Wave him over to the empty seat beside you', effects: { stats: { popularity: 5, happiness: 3 }, npcRelationships: { '16': { friendship: 15 } } }, nextSceneId: 's2' },
+          { id: 'c2', text: 'Stay quiet and observe the new guy', effects: { stats: { rebellion: 5, creativity: 3 } }, nextSceneId: 's3' },
+          { id: 'c3', text: 'Introduce yourself with your best Irish greeting', effects: { stats: { popularity: 10, creativity: 5 }, npcRelationships: { '16': { friendship: 10, romance: 10 } } }, nextSceneId: 's2' },
+        ],
+      },
+      {
+        id: 's2',
+        text: 'Liam slides into the seat next to you, that easy smile never wavering. "You\'re the first person who didn\'t look through me," he says in an accent that makes every word sound like music. "Back home, I\'d buy you a pint for that. Here, I\'ll settle for showing you my photographs." He opens his camera roll and the images take your breath away — abandoned factories bathed in golden light, rain-slicked cobblestones, faces full of stories.',
+        choices: [
+          { id: 'c4', text: 'Ask about the stories behind the photos', effects: { stats: { creativity: 10, happiness: 5 }, npcRelationships: { '16': { friendship: 15, romance: 10 } } }, nextSceneId: 's4' },
+          { id: 'c5', text: 'Offer to show him around town after school', effects: { stats: { popularity: 8, energy: -5 }, npcRelationships: { '16': { friendship: 10, romance: 15 } } }, nextSceneId: 's4' },
+        ],
+      },
+      {
+        id: 's3',
+        text: 'You watch from the back row as Liam navigates the introduction with practiced charm. But you notice something others miss — the way his fingers tighten around his camera strap, the flicker of uncertainty behind the smile. At lunch, you find him standing alone in the courtyard, staring at the oak tree like it holds the secrets of the universe.',
+        choices: [
+          { id: 'c6', text: 'Approach silently and ask what he sees through the lens', effects: { stats: { creativity: 10, rebellion: 5 }, npcRelationships: { '16': { friendship: 12, romance: 8 } } }, nextSceneId: 's4' },
+          { id: 'c7', text: 'Take his photo without warning — a taste of his own medicine', effects: { stats: { creativity: 15, popularity: 5 }, npcRelationships: { '16': { friendship: 5, romance: 20 } } }, nextSceneId: 's4' },
+        ],
+      },
+      {
+        id: 's4',
+        text: 'The sun dips below the Westfield skyline, painting everything in shades of amber and violet. Liam stands beside you on the old bridge overlooking the river, camera forgotten in his hands. "I came here running from something," he admits softly. "But maybe I found something better." The moment hangs between you, fragile and infinite, as the water rushes below.',
+        choices: [
+          { id: 'c8', text: 'Take his hand and tell him he belongs here now', effects: { stats: { happiness: 15, popularity: 5 }, npcRelationships: { '16': { friendship: 10, romance: 25 } } } },
+          { id: 'c9', text: 'Pull out your phone and take a photo of him — your first story together', effects: { stats: { creativity: 15, happiness: 10 }, npcRelationships: { '16': { friendship: 15, romance: 15 } } } },
+          { id: 'c10', text: 'Challenge him to a photography contest around town', statCheck: { stat: 'creativity', threshold: 35 }, effects: { stats: { creativity: 20, popularity: 10, energy: -10 }, npcRelationships: { '16': { friendship: 20 } } } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ch12-the-scandal',
+    title: 'The Scandal',
+    description: 'A cheating ring rocks Westfield High. The school paper is about to publish names. Will you help expose the truth or protect your friends?',
+    semester: 2,
+    episode: 7,
+    lockType: 'progress',
+    requiredSemester: 2,
+    thumbnail: '📰',
+    scenes: [
+      {
+        id: 's1',
+        text: 'The newsroom smells like burnt coffee and deadlines. Olivia slams a folder on the desk between you, her brown eyes blazing with the fire of a journalist on the verge of the biggest story of the year. "Names, dates, test answers. We\'ve got a cheating ring operating out of the library basement. And tomorrow\'s edition goes to press with everything." She studies your face. "I need to know whose side you\'re on."',
+        choices: [
+          { id: 'c1', text: 'Tell her to publish everything — the truth matters', effects: { stats: { academics: 10, popularity: -5, rebellion: 5 }, npcRelationships: { '17': { friendship: 20 } } }, nextSceneId: 's2' },
+          { id: 'c2', text: 'Beg her to consider the lives she\'ll destroy', effects: { stats: { popularity: 5, happiness: -5 }, npcRelationships: { '17': { friendship: -10 } } }, nextSceneId: 's3' },
+          { id: 'c3', text: 'Offer to help her investigate deeper before publishing', effects: { stats: { academics: 8, creativity: 5, energy: -5 }, npcRelationships: { '17': { friendship: 15, romance: 10 } } }, nextSceneId: 's4' },
+        ],
+      },
+      {
+        id: 's2',
+        text: 'The headline hits like a thunderclap: CHEATING EXPOSED: TWELVE STUDENTS NAMED. By noon, the hallway is a warzone. You watch Britney walk past with her head held high, but her hands shake. Chad throws his phone against a locker. "Thanks for the loyalty," he spits, not knowing it was you. But Olivia catches your eye across the hall and nods — a silent acknowledgment that you chose principle over popularity.',
+        choices: [
+          { id: 'c4', text: 'Stand by Olivia when the backlash comes', effects: { stats: { popularity: -10, academics: 15, happiness: 10 }, npcRelationships: { '17': { friendship: 25, romance: 15 }, '1': { friendship: -15 }, '2': { friendship: -10 } } }, nextSceneId: 's5' },
+          { id: 'c5', text: 'Try to quietly help the accused students', effects: { stats: { popularity: 5, academics: -5 }, npcRelationships: { '1': { friendship: 10 }, '17': { friendship: -5 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's3',
+        text: 'Olivia\'s expression hardens. "You want me to bury the truth because it\'s uncomfortable?" She paces the newsroom, her reporter\'s instincts warring with something you did not expect — doubt. "I became a journalist to tell the stories that matter. Not to ruin lives." She stops pacing and looks at you differently, like she\'s really seeing you for the first time. "Convince me there\'s another way."',
+        choices: [
+          { id: 'c6', text: 'Suggest publishing the systemic problem without naming names', effects: { stats: { creativity: 10, academics: 10, popularity: 5 }, npcRelationships: { '17': { friendship: 20, romance: 20 } } }, nextSceneId: 's5' },
+          { id: 'c7', text: 'Propose an anonymous editorial about academic pressure instead', effects: { stats: { creativity: 15, popularity: 10 }, npcRelationships: { '17': { friendship: 15 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's4',
+        text: 'Together, you spend three days tracing the cheating ring to its source. Late nights in the archives. Whispered conversations in empty classrooms. And somewhere between the second pot of coffee and the discovery that the ring leader is a scholarship student facing deportation if they fail, something shifts between you and Olivia. She looks up from her notes one night, hair disheveled, and smiles — not the predatory grin of a reporter, but something real.',
+        choices: [
+          { id: 'c8', text: 'Tell her this story matters because of how she tells it', effects: { stats: { creativity: 10, happiness: 10 }, npcRelationships: { '17': { friendship: 10, romance: 25 } } }, nextSceneId: 's5' },
+          { id: 'c9', text: 'Suggest focusing the story on why students cheat instead of who cheated', effects: { stats: { academics: 15, creativity: 10, popularity: 5 }, npcRelationships: { '17': { friendship: 20 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's5',
+        text: 'The final edition of the semester lands on every desk. Whatever path you chose, Westfield High will never be the same. Olivia stands on the front steps, watching students read her words. "Every story has a cost," she says quietly. "But maybe this one was worth it." She turns to you, and for a moment the ambitious reporter is gone, replaced by a girl who just wants to do the right thing. "Thank you for being part of it." The autumn wind carries the scent of change.',
+        choices: [
+          { id: 'c10', text: 'Tell her she\'s the kind of journalist the world needs', effects: { stats: { happiness: 15, academics: 5 }, npcRelationships: { '17': { friendship: 15, romance: 15 } } } },
+          { id: 'c11', text: 'Say the truth always wins in the end', effects: { stats: { popularity: 5, rebellion: 5, happiness: 10 }, npcRelationships: { '17': { friendship: 10 } } } },
+          { id: 'c12', text: 'Kiss her — some stories are better felt than told', effects: { stats: { happiness: 20, popularity: 5 }, npcRelationships: { '17': { friendship: 10, romance: 30 } } } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ch13-sports-championship',
+    title: 'Sports Championship',
+    description: 'The district championship is here. Lead your team to victory or suffer defeat in front of the whole school.',
+    semester: 3,
+    episode: 8,
+    lockType: 'progress',
+    requiredSemester: 3,
+    requiredStats: { athletics: 40 },
+    thumbnail: '🏆',
+    scenes: [
+      {
+        id: 's1',
+        text: 'The locker room vibrates with tension. Chad is pacing like a caged animal, his game face cracked by the pressure of what comes next. "District finals. My dad won this twenty years ago. I need this." He looks at you with unexpected vulnerability. Then the door opens and Noah walks in — the coach\'s son, quiet and steady, carrying a clipboard covered in play diagrams. "I studied their defense. I know how we beat them." Two leaders. One goal. The room goes silent, waiting for you to choose.',
+        choices: [
+          { id: 'c1', text: 'Back Chad and rally the team with emotion', effects: { stats: { athletics: 5, popularity: 5 }, npcRelationships: { '1': { friendship: 15 }, '18': { friendship: -5 } } }, nextSceneId: 's2' },
+          { id: 'c2', text: 'Support Noah\'s strategic approach', effects: { stats: { athletics: 5, academics: 5 }, npcRelationships: { '18': { friendship: 20 }, '1': { friendship: -5 } } }, nextSceneId: 's2' },
+          { id: 'c3', text: 'Propose combining Chad\'s fire with Noah\'s strategy', effects: { stats: { athletics: 10, creativity: 5, energy: -10 }, npcRelationships: { '1': { friendship: 10 }, '18': { friendship: 15 } } }, nextSceneId: 's3' },
+        ],
+      },
+      {
+        id: 's2',
+        text: 'The whistle blows and the game is a brutal war of attrition. The rival team is bigger, faster, and playing dirty. Chad takes a hard hit in the second quarter and goes down clutching his shoulder. The crowd gasps. Noah is at your side instantly. "I can take his position, but I need you to lead. The quarterback trusts you. Make him believe." The score is tied. Five minutes remain. Everything rides on the next play.',
+        choices: [
+          { id: 'c4', text: 'Call an audacious play — risk everything for glory', statCheck: { stat: 'athletics', threshold: 50 }, effects: { stats: { athletics: 20, popularity: 15, energy: -20 }, npcRelationships: { '1': { friendship: 20 }, '18': { friendship: 15 } } }, nextSceneId: 's4' },
+          { id: 'c5', text: 'Trust Noah\'s playbook and play it safe', effects: { stats: { athletics: 10, popularity: 5 }, npcRelationships: { '18': { friendship: 20 } } }, nextSceneId: 's4' },
+        ],
+      },
+      {
+        id: 's3',
+        text: 'Chad and Noah stand side by side in the huddle, and something clicks. Chad\'s raw power. Noah\'s precision timing. The team feeds off their combined energy. But the rivals respond with a dirty hit that sends Chad sprawling. Noah freezes for half a second — his father, the coach, is watching from the stands. Then he steps forward, calm as still water. "We finish this. Together."',
+        choices: [
+          { id: 'c6', text: 'Take the ball yourself and run for the end zone', statCheck: { stat: 'athletics', threshold: 45 }, effects: { stats: { athletics: 25, popularity: 20, energy: -25 }, npcRelationships: { '1': { friendship: 25 }, '18': { friendship: 20 } } }, nextSceneId: 's4' },
+          { id: 'c7', text: 'Set up Noah for the game-winning throw', effects: { stats: { athletics: 15, popularity: 10, happiness: 10 }, npcRelationships: { '18': { friendship: 25, romance: 10 } } }, nextSceneId: 's4' },
+        ],
+      },
+      {
+        id: 's4',
+        text: 'The final whistle echoes through the stadium. Whether you won or lost, the scoreboard tells only part of the story. In the center of the field, Chad pulls Noah into a hug that transcends rivalry. The crowd erupts. Later, beneath the bleachers, the team gathers around a cooler of victory — or consolation — drinks. Noah pulls you aside, his quiet intensity replaced by something warmer. "I never understood what my dad saw in this sport until today. It\'s not about winning. It\'s about who you become trying."',
+        choices: [
+          { id: 'c8', text: 'Tell him his father is proud — and so are you', effects: { stats: { happiness: 20, athletics: 5 }, npcRelationships: { '18': { friendship: 20, romance: 20 } } } },
+          { id: 'c9', text: 'Propose celebrating with the whole team', effects: { stats: { popularity: 15, happiness: 15 }, npcRelationships: { '1': { friendship: 15 }, '18': { friendship: 15 } } } },
+          { id: 'c10', text: 'Challenge Chad and Noah to a rematch — just the three of you', effects: { stats: { athletics: 15, energy: -10, happiness: 10 }, npcRelationships: { '1': { friendship: 20 }, '18': { friendship: 20 } } } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ch14-talent-show',
+    title: 'Talent Show',
+    description: 'The annual talent show is calling. Will you shine on stage or help someone else steal the spotlight?',
+    semester: 3,
+    episode: 9,
+    lockType: 'progress',
+    requiredSemester: 3,
+    requiredStats: { creativity: 35 },
+    thumbnail: '🎤',
+    scenes: [
+      {
+        id: 's1',
+        text: 'The auditorium buzzes with anticipation. Backstage is a kaleidoscope of costumes, nervous energy, and last-minute rehearsals. Skyler is setting up an easel for a live painting performance, their hands steady despite the chaos. Raven leans against a pillar in a long black dress, clutching a notebook of poems. And Zoe — electric in studded leather — is tuning her bass with the focus of a surgeon. Each of them catches your eye, silently asking you to choose.',
+        choices: [
+          { id: 'c1', text: 'Join Skyler and paint live on stage', effects: { stats: { creativity: 10 }, npcRelationships: { '5': { friendship: 15 } } }, nextSceneId: 's2' },
+          { id: 'c2', text: 'Support Raven\'s spoken word performance', effects: { stats: { creativity: 10 }, npcRelationships: { '4': { friendship: 15, romance: 10 } } }, nextSceneId: 's3' },
+          { id: 'c3', text: 'Perform alongside Zoe and her band', effects: { stats: { creativity: 10, rebellion: 5 }, npcRelationships: { '9': { friendship: 15 } } }, nextSceneId: 's4' },
+          { id: 'c4', text: 'Go solo — this is your moment', effects: { stats: { creativity: 10, popularity: 5 }, npcRelationships: { '5': { friendship: -5 }, '4': { friendship: -5 }, '9': { friendship: -5 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's2',
+        text: 'Skyler\'s canvas is massive — six feet of white space waiting to become something extraordinary. "I\'m painting the audience as I see them," they explain, squeezing crimson onto their palette. "Not their faces. Their souls." As the music swells, Skyler\'s brush dances across the canvas and you find yourself drawn into the rhythm, adding your own strokes to the emerging masterpiece. The crowd watches, breathless.',
+        choices: [
+          { id: 'c5', text: 'Paint something that represents your friendship', effects: { stats: { creativity: 20, happiness: 15 }, npcRelationships: { '5': { friendship: 25, romance: 20 } } }, nextSceneId: 's5' },
+          { id: 'c6', text: 'Let Skyler take the lead and support their vision', effects: { stats: { creativity: 15, happiness: 10 }, npcRelationships: { '5': { friendship: 20 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's3',
+        text: 'Raven\'s poems are not the flowery verses you expected — they are raw, jagged things that cut straight to the bone. "I wrote this one last night," she whispers, not looking at you. "It\'s about... someone." She takes the stage and the spotlight finds her like it was made for her. Her voice starts low, almost a whisper, then builds to a storm of words that leaves the auditorium in stunned silence. Then, one person claps. Then another. Then thunder.',
+        choices: [
+          { id: 'c7', text: 'Whisper that you know the poem is about you', effects: { stats: { creativity: 10, happiness: 20 }, npcRelationships: { '4': { friendship: 10, romance: 30 } } }, nextSceneId: 's5' },
+          { id: 'c8', text: 'Lead the standing ovation from the front row', effects: { stats: { popularity: 10, creativity: 10 }, npcRelationships: { '4': { friendship: 20, romance: 15 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's4',
+        text: 'The stage lights up in violet and crimson. Zoe\'s band launches into a cover of a song you have never heard but instantly feel in your bones. The bass line throbs through the floorboards and up your spine. Zoe catches your eye from across the stage and grins — wild, free, alive. "Jump in whenever you\'re ready!" she shouts over the roar of amplifiers. The crowd is moving now, bodies swaying as one.',
+        choices: [
+          { id: 'c9', text: 'Grab a microphone and sing with everything you have', statCheck: { stat: 'creativity', threshold: 45 }, effects: { stats: { creativity: 25, popularity: 20, rebellion: 10 }, npcRelationships: { '9': { friendship: 20, romance: 15 } } }, nextSceneId: 's5' },
+          { id: 'c10', text: 'Dance like the music is the only thing that exists', effects: { stats: { creativity: 15, happiness: 15, athletics: 5 }, npcRelationships: { '9': { friendship: 15 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's5',
+        text: 'The judges announce the winner but nobody really cares. Backstage, the real prize is the electricity in the air, the sweat and laughter, the feeling that something magical happened tonight. Skyler, Raven, and Zoe surround you — rivals on paper, family in this moment. "We should do this every year," Zoe says, still breathless. Raven almost smiles. "We just might." The lights dim, but the memory will burn bright forever.',
+        choices: [
+          { id: 'c11', text: 'Propose starting a performing arts collective', effects: { stats: { creativity: 15, popularity: 10 }, npcRelationships: { '5': { friendship: 15 }, '4': { friendship: 15 }, '9': { friendship: 15 } } } },
+          { id: 'c12', text: 'Celebrate with everyone at the all-night diner', effects: { stats: { happiness: 20, popularity: 10, energy: -10 }, npcRelationships: { '5': { friendship: 10 }, '4': { friendship: 10, romance: 10 }, '9': { friendship: 10 } } } },
+          { id: 'c13', text: 'Steal a quiet moment with your closest confidant', effects: { stats: { happiness: 25 }, npcRelationships: { '5': { romance: 20 }, '4': { romance: 20 }, '9': { romance: 20 } } } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ch15-the-election',
+    title: 'The Election',
+    description: 'Student council elections divide the school. Run for office, back a candidate, or manipulate the outcome from the shadows.',
+    semester: 4,
+    episode: 10,
+    lockType: 'premium',
+    cost: { gems: 20 },
+    requiredSemester: 4,
+    requiredStats: { popularity: 45 },
+    thumbnail: '🗳️',
+    scenes: [
+      {
+        id: 's1',
+        text: 'The quad has been transformed into a political battleground. Red banners for Britney\'s "Experience and Excellence" campaign flutter next to Tyler\'s blue "Change Now" signs. But the real earthquake is Emma — the transfer student who announced her candidacy yesterday and is already drawing crowds that dwarf both established campaigns. She catches you watching from the library window and waves, that million-dollar smile hiding intentions you can not quite read.',
+        choices: [
+          { id: 'c1', text: 'Enter the race yourself — this is your moment', effects: { stats: { popularity: 15, rebellion: 5 }, npcRelationships: { '2': { friendship: -15 }, '11': { friendship: -10 }, '19': { friendship: -10 } } }, nextSceneId: 's2' },
+          { id: 'c2', text: 'Offer to manage Britney\'s campaign', effects: { stats: { popularity: 10, academics: 5 }, npcRelationships: { '2': { friendship: 20 } } }, nextSceneId: 's3' },
+          { id: 'c3', text: 'Secretly support Tyler while publicly staying neutral', effects: { stats: { popularity: 5, creativity: 10, rebellion: 5 }, npcRelationships: { '11': { friendship: 20 } } }, nextSceneId: 's4' },
+          { id: 'c4', text: 'Investigate Emma\'s sudden popularity', effects: { stats: { academics: 10, creativity: 5 }, npcRelationships: { '19': { friendship: 10, romance: 5 } } }, nextSceneId: 's5' },
+        ],
+      },
+      {
+        id: 's2',
+        text: 'The podium feels different when you are standing behind it instead of watching from the crowd. Your hands grip the edges as three hundred faces turn toward you expectantly. Britney\'s smile is a weapon. Tyler\'s handshake is a trap. And Emma — Emma looks genuinely delighted to have new competition. "The more the merrier," she says, and you almost believe her. Almost.',
+        choices: [
+          { id: 'c5', text: 'Deliver a speech about real student issues', statCheck: { stat: 'popularity', threshold: 55 }, effects: { stats: { popularity: 25, academics: 10 }, npcRelationships: { '2': { friendship: -10 }, '11': { friendship: -10 }, '19': { friendship: -5 } } }, nextSceneId: 's6' },
+          { id: 'c6', text: 'Charm the crowd with charisma and bold promises', effects: { stats: { popularity: 15, rebellion: 10 }, npcRelationships: { '19': { friendship: 10 } } }, nextSceneId: 's6' },
+        ],
+      },
+      {
+        id: 's3',
+        text: 'Britney\'s campaign headquarters is a war room of color-coded spreadsheets and volunteer schedules. "I have been planning this since sophomore year," she admits, pushing a binder toward you. "But Emma came out of nowhere with something I do not have — mystery. People love what they can not predict." She leans forward, the ambitious president showing a rare crack of vulnerability. "Help me win this. Please."',
+        choices: [
+          { id: 'c7', text: 'Organize a debate that highlights Britney\'s experience', effects: { stats: { academics: 15, popularity: 10 }, npcRelationships: { '2': { friendship: 25, romance: 15 } } }, nextSceneId: 's6' },
+          { id: 'c8', text: 'Dig up dirt on Emma to use against her', effects: { stats: { rebellion: 15, popularity: 5 }, npcRelationships: { '2': { friendship: 15 }, '19': { friendship: -20 } } }, nextSceneId: 's6' },
+        ],
+      },
+      {
+        id: 's4',
+        text: 'Tyler\'s campaign runs on a shoestring budget and pure idealism. "The student council should matter," he tells you over lukewarm coffee in the debate hall. "Not just plan dances. Advocate for real change. Mental health funding. Better food. A voice." His passion is infectious, and you find yourself sketching campaign posters late into the night. But Britney\'s machine is relentless, and Emma\'s star is rising. Can idealism win?',
+        choices: [
+          { id: 'c9', text: 'Create a viral social media campaign for Tyler', effects: { stats: { creativity: 20, popularity: 15 }, npcRelationships: { '11': { friendship: 25, romance: 15 } } }, nextSceneId: 's6' },
+          { id: 'c10', text: 'Negotiate an alliance between Tyler and Britney against Emma', effects: { stats: { academics: 15, popularity: 10 }, npcRelationships: { '2': { friendship: 10 }, '11': { friendship: 20 } } }, nextSceneId: 's6' },
+        ],
+      },
+      {
+        id: 's5',
+        text: 'Emma\'s campaign office is a converted supply closet that smells like fresh paint and ambition. She shuts the door behind you and the act drops — just slightly. "You want to know why I\'m really running," she says. It is not a question. She pulls out a file. "The principal is cutting arts funding to pay for a new football scoreboard. I found out at my old school before I transferred." Her eyes meet yours. "Someone needs to stop it."',
+        choices: [
+          { id: 'c11', text: 'Promise to expose the funding cuts together', effects: { stats: { academics: 10, creativity: 10, popularity: 5 }, npcRelationships: { '19': { friendship: 25, romance: 20 } } }, nextSceneId: 's6' },
+          { id: 'c12', text: 'Convince her to drop out and endorse Tyler instead', effects: { stats: { popularity: 10, academics: 5 }, npcRelationships: { '19': { friendship: 10 }, '11': { friendship: 15 } } }, nextSceneId: 's6' },
+        ],
+      },
+      {
+        id: 's6',
+        text: 'Election day arrives like a thunderclap. The gymnasium fills with every student in Westfield, buzzing with anticipation and divided loyalties. The votes are cast, counted, and recounted. When the winner is announced — whether it is you, Britney, Tyler, or Emma — the crowd\'s reaction tells the real story. Some cheer. Some weep. Some plot their revenge. But in the end, high school elections are never really about who wins. They are about who shows up. And you showed up.',
+        choices: [
+          { id: 'c13', text: 'Accept the result with grace and work toward unity', effects: { stats: { popularity: 20, happiness: 20 }, npcRelationships: { '2': { friendship: 10 }, '11': { friendship: 10 }, '19': { friendship: 10 } } } },
+          { id: 'c14', text: 'Celebrate your victory wildly — you earned it', effects: { stats: { popularity: 15, happiness: 25, rebellion: 10 } } },
+          { id: 'c15', text: 'Whisper to your closest ally that this is only the beginning', effects: { stats: { popularity: 10, creativity: 10 }, npcRelationships: { '2': { romance: 15 }, '11': { romance: 15 }, '19': { romance: 15 } } } },
+        ],
+      },
+    ],
+  },
 ];
 
 export function canUnlockChapter(

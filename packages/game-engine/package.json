@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./atmosphere": "./src/atmosphere.ts",
+    "./world-events": "./src/world-events.ts",
+    "./event-calendar": "./src/event-calendar.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
