@@ -74,7 +74,7 @@ const OUTFIT_COLORS: Record<number, string> = {
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedG = Animated.createAnimatedComponent(G);
+const AnimatedG = Animated.createAnimatedComponent(G) as any;
 
 interface AnimatedPortraitProps {
   seed: string;
@@ -286,13 +286,13 @@ export function AnimatedPortrait({
           <Circle cx="78" cy="48" r="5" fill={skinTone} />
 
           {/* Eyes with blink */}
-          <AnimatedG style={leftEyeScaleY}>
+          <AnimatedG style={leftEyeScaleY as any}>
             <Ellipse cx="40" cy="45" rx="5" ry="6" fill="#fff" />
             <Circle cx="40" cy="45" r="3" fill={eyeColor} />
             <Circle cx="41" cy="44" r="1" fill="#fff" />
           </AnimatedG>
 
-          <AnimatedG style={rightEyeScaleY}>
+          <AnimatedG style={rightEyeScaleY as any}>
             <Ellipse cx="60" cy="45" rx="5" ry="6" fill="#fff" />
             <Circle cx="60" cy="45" r="3" fill={eyeColor} />
             <Circle cx="61" cy="44" r="1" fill="#fff" />

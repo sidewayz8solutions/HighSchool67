@@ -14,8 +14,10 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
     "@repo/types": "workspace:*",
+    "expo-haptics": "~15.0.8",
+    "expo-notifications": "~0.29.0",
     "immer": "^10.1.1",
-    "zustand": "^5.0.4"
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",

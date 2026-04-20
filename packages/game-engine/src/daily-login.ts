@@ -208,7 +208,7 @@ export function claimDailyReward(
     };
   }
 
-  if (streak.dailyRewards[rewardIndex].claimed) {
+  if (streak.dailyRewards[rewardIndex]!.claimed) {
     return { updatedStreak: streak, reward: null };
   }
 
@@ -218,7 +218,7 @@ export function claimDailyReward(
 
   return {
     updatedStreak: { ...streak, dailyRewards: updatedRewards },
-    reward: updatedRewards[rewardIndex],
+    reward: updatedRewards[rewardIndex]!,
   };
 }
 

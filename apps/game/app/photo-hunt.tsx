@@ -12,6 +12,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   runOnJS,
+  withSequence,
 } from 'react-native-reanimated';
 
 const { width: SCREEN_W } = Dimensions.get('window');

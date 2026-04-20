@@ -258,7 +258,7 @@ export default function DailyRewardsScreen() {
     loginStreak,
     claimDailyReward,
     processDailyLogin,
-    useStreakProtection,
+    useStreakProtection: activateStreakProtection,
     addCurrency,
   } = useGameStore();
 
@@ -297,14 +297,14 @@ export default function DailyRewardsScreen() {
   }, [claimDailyReward, streakStatus.currentDay]);
 
   const handleStreakProtection = useCallback(() => {
-    const success = useStreakProtection();
+    const success = activateStreakProtection();
     if (success) {
       setClaimMessage('Streak protection activated!');
     } else {
       setClaimMessage('Protection already used');
     }
     setTimeout(() => setClaimMessage(''), 3000);
-  }, [useStreakProtection]);
+  }, [activateStreakProtection]);
 
   // Today's reward
   const todayReward = rewards.find((r) => r.day === streakStatus.currentDay);
@@ -313,7 +313,7 @@ export default function DailyRewardsScreen() {
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={colors.gradientPrimary as unknown as string[]}
+        colors={colors.gradientPrimary}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.headerGradient}

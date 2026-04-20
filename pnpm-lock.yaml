@@ -216,11 +216,17 @@ importers:
       '@repo/types':
         specifier: workspace:*
         version: link:../types
+      expo-haptics:
+        specifier: ~15.0.8
+        version: 15.0.8(expo@54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(typescript@5.9.2))
+      expo-notifications:
+        specifier: ~0.29.0
+        version: 0.29.14(expo@54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(typescript@5.9.2))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       immer:
         specifier: ^10.1.1
         version: 10.2.0
       zustand:
-        specifier: ^5.0.4
+        specifier: ^5.0.12
         version: 5.0.12(patch_hash=x3kpldltafddijyt6ghpwvrr2i)(@types/react@19.1.17)(immer@10.2.0)(react@19.1.0)(use-sync-external-store@1.6.0(react@19.1.0))
     devDependencies:
       '@repo/typescript-config':
@@ -243,6 +249,9 @@ importers:
 
   packages/ui:
     dependencies:
+      expo-linear-gradient:
+        specifier: ^55.0.13
+        version: 55.0.13(expo@54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(typescript@5.9.2))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react:
         specifier: 19.1.0
         version: 19.1.0

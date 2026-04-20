@@ -9,12 +9,27 @@ interface ButtonProps {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  accessibilityLabel?: string;
+  haptic?: 'light' | 'medium' | 'heavy' | 'success' | 'none';
 }
 
-export function Button({ title, onPress, variant = 'primary', disabled, style, textStyle }: ButtonProps) {
+export function Button({ title, onPress, variant = 'primary', disabled, style, textStyle, accessibilityLabel, haptic = 'light' }: ButtonProps) {
   const isPrimary = variant === 'primary';
   const isSecondary = variant === 'secondary';
   const isGold = variant === 'gold';
+
+  const handlePress = () => {
+    if (haptic !== 'none') {
+      // Haptics are optional and loaded lazily to avoid circular deps
+      try {
+        const { haptics } = require('@repo/game-engine');
+        haptics[haptic]?.();
+      } catch {
+        // Haptics not available
+      }
+    }
+    onPress();
+  };
 
   if (isPrimary || isSecondary || isGold) {
     const gradientColors = isPrimary
@@ -25,10 +40,13 @@ export function Button({ title, onPress, variant = 'primary', disabled, style, t
 
     return (
       <TouchableOpacity
-        onPress={onPress}
+        onPress={handlePress}
         disabled={disabled}
         activeOpacity={0.8}
         style={[styles.gradientBtnContainer, disabled && styles.disabled, style]}
+        accessibilityLabel={accessibilityLabel ?? title}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !!disabled }}
       >
         <LinearGradient
           colors={gradientColors as [string, string, ...string[]]}
@@ -44,7 +62,7 @@ export function Button({ title, onPress, variant = 'primary', disabled, style, t
 
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
       style={[
@@ -53,6 +71,9 @@ export function Button({ title, onPress, variant = 'primary', disabled, style, t
         disabled && styles.disabled,
         style,
       ]}
+      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
     >
       <Text style={[styles.ghostText, textStyle]}>{title}</Text>
     </TouchableOpacity>

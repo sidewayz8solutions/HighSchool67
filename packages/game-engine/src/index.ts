@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { haptics } from './haptics';
 import type {
   GameState,
   Player,
@@ -411,7 +412,7 @@ function pickRandomEvent(period: Period, semester: number): RandomEvent | null {
     r -= event.weight;
     if (r <= 0) return event;
   }
-  return eligible[0];
+  return eligible[0] ?? null;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -450,6 +451,13 @@ export const useGameStore = create<GameStore>()(
       audioEnabled: true,
       audioVolumes: { master: 0.8, music: 0.7, sfx: 1.0 },
 
+      // Atmosphere & Events
+      atmosphere: getDefaultAtmosphere(),
+      calendar: getCalendarForSemester(1),
+      activeEvents: [],
+      eventHistory: [],
+      currentSeasonalTheme: undefined,
+
       // ─── Actions ────────────────────────────────────────────────
 
       initGame: (name, clique, avatarConfig) => {
@@ -479,6 +487,11 @@ export const useGameStore = create<GameStore>()(
           state.loginStreak = getDefaultLoginStreak();
           state.audioEnabled = true;
           state.audioVolumes = { master: 0.8, music: 0.7, sfx: 1.0 };
+          state.atmosphere = getDefaultAtmosphere();
+          state.calendar = getCalendarForSemester(1);
+          state.activeEvents = [];
+          state.eventHistory = [];
+          state.currentSeasonalTheme = undefined;
         });
       },
 
@@ -566,15 +579,20 @@ export const useGameStore = create<GameStore>()(
           if (currency.points) state.player.currency.points += currency.points;
           if (currency.gems) state.player.currency.gems += currency.gems;
         });
+        haptics.success();
       },
 
       spendCurrency: (cost) => {
         const { player } = get();
-        if (player.currency.points < cost.points || player.currency.gems < cost.gems) return false;
+        if (player.currency.points < cost.points || player.currency.gems < cost.gems) {
+          haptics.error();
+          return false;
+        }
         set((state) => {
           state.player.currency.points -= cost.points;
           state.player.currency.gems -= cost.gems;
         });
+        haptics.medium();
         return true;
       },
 
@@ -626,9 +644,11 @@ export const useGameStore = create<GameStore>()(
           const npc = state.npcs.find((n) => n.id === npcId);
           if (npc) npc.unlocked = true;
         });
+        haptics.success();
       },
 
       updateChallenge: (challengeId, value) => {
+        let justCompleted = false;
         set((state) => {
           const challenge = state.challenges.find((c) => c.id === challengeId);
           if (!challenge || challenge.completed) return;
@@ -637,8 +657,10 @@ export const useGameStore = create<GameStore>()(
             challenge.completed = true;
             state.player.currency.points += challenge.reward.points;
             state.player.currency.gems += challenge.reward.gems;
+            justCompleted = true;
           }
         });
+        if (justCompleted) haptics.success();
       },
 
       resetDailyChallenges: () => {
@@ -651,6 +673,7 @@ export const useGameStore = create<GameStore>()(
         set((state) => {
           state.player.stats.energy = Math.min(MAX_ENERGY, state.player.stats.energy + amount);
         });
+        haptics.medium();
       },
 
       unlockChapter: (chapterId, hasSeasonPass) => {
@@ -880,6 +903,7 @@ export const useGameStore = create<GameStore>()(
           }
           state.careerMilestonesCompleted = [];
         });
+        haptics.success();
       },
 
       checkCareerMilestones: () => {
@@ -913,6 +937,7 @@ export const useGameStore = create<GameStore>()(
               if (mc.reward.currency?.gems) s.player.currency.gems += mc.reward.currency.gems;
             }
           });
+          haptics.success();
         }
 
         return { newlyCompleted: newlyCompleted.map((m) => m.id), rewards: totalRewards };
@@ -946,24 +971,26 @@ export const useGameStore = create<GameStore>()(
         const state = get();
         const result = claimDailyReward(state.loginStreak, day);
 
-        if (!result.reward) {
+        const reward = result.reward;
+        if (!reward) {
+          haptics.error();
           return { success: false, reward: null };
         }
 
         set((s) => {
           s.loginStreak = result.updatedStreak;
-          if (result.reward.reward.points) {
-            s.player.currency.points += result.reward.reward.points;
+          if (reward.reward.points) {
+            s.player.currency.points += reward.reward.points;
           }
-          if (result.reward.reward.gems) {
-            s.player.currency.gems += result.reward.reward.gems;
+          if (reward.reward.gems) {
+            s.player.currency.gems += reward.reward.gems;
           }
-          if (result.reward.reward.energy) {
-            s.player.stats.energy = Math.min(MAX_ENERGY, s.player.stats.energy + result.reward.reward.energy);
+          if (reward.reward.energy) {
+            s.player.stats.energy = Math.min(MAX_ENERGY, s.player.stats.energy + reward.reward.energy);
           }
         });
 
-        return { success: true, reward: result.reward };
+        return { success: true, reward: reward };
       },
 
       useStreakProtection: () => {
@@ -988,6 +1015,78 @@ export const useGameStore = create<GameStore>()(
       setAudioVolume: (channel, volume) => {
         set((state) => {
           state.audioVolumes[channel] = Math.max(0, Math.min(1, volume));
+        });
+      },
+
+      advanceToEvent: (eventId) => {
+        set((state) => {
+          const event = state.calendar
+            .flatMap((entry) => entry.events)
+            .find((e) => e.id === eventId);
+          if (event) {
+            state.activeEvents.push(event);
+          }
+        });
+      },
+
+      makeEventChoice: (eventId, choiceId) => {
+        set((state) => {
+          const event = state.activeEvents.find((e) => e.id === eventId);
+          if (!event) return;
+          const choice = event.choices.find((c) => c.id === choiceId);
+          if (!choice) return;
+          if (choice.effects.stats) {
+            (Object.keys(choice.effects.stats) as Array<keyof Stats>).forEach((key) => {
+              const val = choice.effects.stats![key] ?? 0;
+              state.player.stats[key] = Math.max(0, Math.min(MAX_STAT, state.player.stats[key] + val));
+            });
+          }
+          if (choice.effects.npcRelationships) {
+            Object.entries(choice.effects.npcRelationships).forEach(([npcId, effects]) => {
+              const npc = state.npcs.find((n) => n.id === npcId);
+              if (npc) {
+                if (effects.friendship) npc.relationship = Math.max(0, Math.min(100, npc.relationship + effects.friendship));
+                if (effects.romance) npc.romance = Math.max(0, Math.min(100, npc.romance + effects.romance));
+              }
+            });
+          }
+          state.eventHistory.push({ eventId, choiceId, day: state.progress.day });
+          state.activeEvents = state.activeEvents.filter((e) => e.id !== eventId);
+        });
+        haptics.medium();
+      },
+
+      getUpcomingEvents: (daysAhead) => {
+        const state = get();
+        const currentDay = state.progress.day;
+        return state.calendar.filter(
+          (entry) => entry.date.day >= currentDay && entry.date.day <= currentDay + daysAhead
+        );
+      },
+
+      getCurrentAtmosphere: () => {
+        return get().atmosphere;
+      },
+
+      triggerCrisisEvent: () => {
+        const state = get();
+        const crisis = generateRandomCrisis(state.atmosphere);
+        if (crisis) {
+          set((s) => {
+            s.activeEvents.push(crisis);
+          });
+          haptics.warning();
+        }
+        return crisis;
+      },
+
+      applySeasonalTheme: () => {
+        set((state) => {
+          const theme = getCurrentSeasonalTheme(state.progress.semester, state.progress.day);
+          state.currentSeasonalTheme = theme;
+          if (theme) {
+            state.atmosphere = applySeasonalModifiers(state.atmosphere, theme);
+          }
         });
       },
     })),
@@ -1085,3 +1184,6 @@ export {
   formatCountdown,
   getTournamentHistory,
 } from './tournament';
+
+export { haptics, setHapticsEnabled, isHapticsEnabled } from './haptics';
+export type { HapticType } from './haptics';

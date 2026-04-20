@@ -334,7 +334,7 @@ export default function SkillTreeScreen() {
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={treeColors as unknown as string[]}
+        colors={treeColors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.headerGradient}
@@ -429,7 +429,7 @@ export default function SkillTreeScreen() {
                       {/* Connection line from previous tier */}
                       {tier > 1 && (
                         <ConnectionLine
-                          fromPurchased={getNodesForBranchAndTier(branch, tier - 1).some((n) => n.purchased)}
+                          fromPurchased={getNodesForBranchAndTier(branch, (tier - 1) as 1 | 2 | 3 | 4).some((n) => n.purchased)}
                           toPurchased={nodes.some((n) => n.purchased)}
                           treeColor={treeColors[0]}
                         />

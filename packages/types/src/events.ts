@@ -60,6 +60,7 @@ export interface AtmosphereState {
   socialEnergy: number; // 0-100
   dramaLevel: number; // 0-100
   excitementLevel: number; // 0-100
+  dominant?: string; // e.g. 'chill', 'tense', 'energetic'
   recentEvents: Array<{ eventId: string; impact: number; timestamp: number }>;
 }
 

@@ -467,7 +467,7 @@ export default function DebateClubScreen() {
 
           <View style={styles.opponentBox}>
             <Text style={styles.opponentLabel}>OPPONENT SAYS:</Text>
-            <Text style={styles.opponentStance}>"{scenario.opponentStance}"</Text>
+            <Text style={styles.opponentStance}>{'"'}{scenario.opponentStance}{'"'}</Text>
           </View>
         </Animated.View>
       )}

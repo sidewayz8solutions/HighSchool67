@@ -16,6 +16,7 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
+    "expo-linear-gradient": "^55.0.13",
     "react": "19.1.0",
     "react-native": "0.81.5"
   }

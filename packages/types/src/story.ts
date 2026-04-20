@@ -31,7 +31,7 @@ export interface StoryChapter {
   lockType: ChapterLockType;
   cost?: { points?: number; gems?: number };
   requiredSemester?: number;
-  requiredStats?: Partial<Record<'academics' | 'athletics' | 'creativity' | 'popularity' | 'rebellion', number>>;
+  requiredStats?: Partial<Record<'academics' | 'athletics' | 'creativity' | 'popularity' | 'rebellion' | 'happiness', number>>;
   scenes: StoryScene[];
   thumbnail: string;
 }

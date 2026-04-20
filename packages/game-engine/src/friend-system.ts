@@ -71,13 +71,13 @@ export function visitFriendRoom(friend: Friend): Room {
 }
 
 export function canSendGift(friend: Friend): boolean {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0]!;
   const sentToday = friend.giftHistory.filter((g) => g.sentAt.startsWith(today)).length;
   return sentToday < DAILY_GIFT_LIMIT;
 }
 
 export function getRemainingGifts(friend: Friend): number {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0]!;
   const sentToday = friend.giftHistory.filter((g) => g.sentAt.startsWith(today)).length;
   return Math.max(0, DAILY_GIFT_LIMIT - sentToday);
 }

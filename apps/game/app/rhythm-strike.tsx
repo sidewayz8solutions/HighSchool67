@@ -362,7 +362,7 @@ export default function RhythmStrikeScreen() {
 
         <Button
           title={gameState === 'gameover' ? 'Play Again' : 'Back to Home'}
-          variant={gameState === 'gameover' ? 'default' : 'ghost'}
+          variant={gameState === 'gameover' ? 'primary' : 'ghost'}
           onPress={() => {
             if (gameState === 'gameover') {
               setGameState('idle');

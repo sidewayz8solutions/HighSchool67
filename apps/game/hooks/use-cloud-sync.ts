@@ -39,7 +39,9 @@ export function useCloudSync(): UseCloudSyncReturn {
       player: gameState.player,
       progress: gameState.progress,
       npcs: gameState.npcs,
+      rivals: gameState.rivals,
       challenges: gameState.challenges,
+      achievements: gameState.achievements,
       storyProgress: gameState.storyProgress,
       lastPlayedAt: gameState.lastPlayedAt,
     };

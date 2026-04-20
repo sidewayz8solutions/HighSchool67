@@ -505,7 +505,7 @@ export function useActiveAbility(
     return { success: false, message: 'Ability not found', updatedAbilities: currentAbilities };
   }
 
-  const ability = currentAbilities[abilityIndex];
+  const ability = currentAbilities[abilityIndex]!;
   if (!ability.unlocked) {
     return { success: false, message: 'Ability is locked', updatedAbilities: currentAbilities };
   }

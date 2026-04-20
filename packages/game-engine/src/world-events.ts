@@ -763,7 +763,7 @@ export function canParticipateInEvent(
   if (req.minStats) {
     for (const [key, val] of Object.entries(req.minStats)) {
       const playerStat = player.stats[key as keyof typeof player.stats] as number | undefined;
-      if (playerStat === undefined || playerStat < val) return false;
+      if (playerStat === undefined || val === undefined || playerStat < val) return false;
     }
   }
 
@@ -803,7 +803,7 @@ export function processEventChoice(
     for (const [key, val] of Object.entries(choice.effects.stats)) {
       if (val === undefined) continue;
       const current = updatedPlayer.stats[key as keyof typeof updatedPlayer.stats] as number;
-      (updatedPlayer.stats as Record<string, number>)[key] = clamp((current ?? 0) + val, 0, 100);
+      (updatedPlayer.stats as unknown as Record<string, number>)[key] = clamp((current ?? 0) + val, 0, 100);
     }
   }
 
@@ -827,7 +827,7 @@ export function processEventChoice(
     for (const [key, val] of Object.entries(event.rewards.stats)) {
       if (val === undefined) continue;
       const current = updatedPlayer.stats[key as keyof typeof updatedPlayer.stats] as number;
-      (updatedPlayer.stats as Record<string, number>)[key] = clamp((current ?? 0) + val, 0, 100);
+      (updatedPlayer.stats as unknown as Record<string, number>)[key] = clamp((current ?? 0) + val, 0, 100);
     }
   }
   if (event.rewards?.currency) {

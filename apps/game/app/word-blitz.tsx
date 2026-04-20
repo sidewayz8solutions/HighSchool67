@@ -151,7 +151,11 @@ export default function WordBlitzScreen() {
   // Animated values
   const shakeOffset = useSharedValue(0);
   const glowScale = useSharedValue(1);
-  const letterAnims = Array.from({ length: 12 }, () => useSharedValue(0));
+  const letterAnims = [
+    useSharedValue(0), useSharedValue(0), useSharedValue(0), useSharedValue(0),
+    useSharedValue(0), useSharedValue(0), useSharedValue(0), useSharedValue(0),
+    useSharedValue(0), useSharedValue(0), useSharedValue(0), useSharedValue(0),
+  ];
 
   const shakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeOffset.value }],
@@ -366,7 +370,7 @@ export default function WordBlitzScreen() {
 
         <Button
           title={gameState === 'gameover' ? 'Play Again' : 'Back to Home'}
-          variant={gameState === 'gameover' ? 'default' : 'ghost'}
+          variant={gameState === 'gameover' ? 'primary' : 'ghost'}
           onPress={() => {
             if (gameState === 'gameover') {
               setGameState('idle');

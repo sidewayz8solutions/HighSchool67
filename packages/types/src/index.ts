@@ -1,6 +1,8 @@
 export * from './story'
 export * from './avatar'
 export * from './npc-system'
+export * from './events'
+export * from './progression'
 
 export type Clique = 'jock' | 'nerd' | 'popular' | 'goth' | 'artsy' | 'preppy'
 

@@ -2,10 +2,11 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { colors } from '@repo/ui';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 export default function RootLayout() {
   return (
-    <>
+    <ErrorBoundary>
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: colors.background },
@@ -17,6 +18,6 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="light" />
-    </>
+    </ErrorBoundary>
   );
 }

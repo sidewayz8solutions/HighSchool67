@@ -84,7 +84,7 @@ function generateSingleAction(
   )
 
   const possibleTypes = getPossibleActionTypes(npc.personality)
-  const type = possibleTypes[Math.floor(Math.random() * possibleTypes.length)]
+  const type = possibleTypes[Math.floor(Math.random() * possibleTypes.length)]!
 
   let targetNpcId: string | undefined
   let targetLocation: string | undefined

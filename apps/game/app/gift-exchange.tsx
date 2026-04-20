@@ -20,7 +20,8 @@ import {
 } from '@repo/game-engine';
 import { NpcAvatar } from '@/components/visuals';
 import Animated, { FadeInUp, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import type { Friend, RoomItem } from '@repo/types';
+import type { RoomItem } from '@repo/types';
+import type { Friend } from '@repo/game-engine';
 
 const RARITY_COLORS: Record<string, string> = {
   common: '#94a3b8',
@@ -150,7 +151,7 @@ export default function GiftExchangeScreen() {
     return reactions[Math.floor(Math.random() * reactions.length)];
   };
 
-  const recentGifts = selectedFriend.giftHistory.slice(-5).reverse();
+  const recentGifts = selectedFriend?.giftHistory.slice(-5).reverse() ?? [];
 
   return (
     <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
@@ -267,7 +268,7 @@ export default function GiftExchangeScreen() {
                 <View style={styles.reactionBubble}>
                   <Text style={styles.reactionText}>
                     {selectedFriend.displayName} will probably say:{'\n'}
-                    <Text style={styles.reactionQuote}>"{getRandomReaction(selectedFriend.displayName)}"</Text>
+                    <Text style={styles.reactionQuote}>{'"'}{getRandomReaction(selectedFriend.displayName)}{'"'}</Text>
                   </Text>
                 </View>
 

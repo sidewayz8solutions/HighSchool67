@@ -24,7 +24,7 @@ export default function AuthScreen() {
   if (user) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>You're Signed In!</Text>
+        <Text style={styles.title}>You&apos;re Signed In!</Text>
         <Card style={styles.card}>
           <Text style={styles.label}>User ID</Text>
           <Text style={styles.value}>{user.id.slice(0, 16)}...</Text>

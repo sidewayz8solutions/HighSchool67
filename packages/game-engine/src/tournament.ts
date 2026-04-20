@@ -198,7 +198,7 @@ export function submitScore(
   let updatedEntries: LeaderboardEntry[];
 
   if (existingIndex >= 0) {
-    const existing = tournament.entries[existingIndex];
+    const existing = tournament.entries[existingIndex]!;
     if (score > existing.score) {
       updatedEntries = [...tournament.entries];
       updatedEntries[existingIndex] = { ...newEntry, score };

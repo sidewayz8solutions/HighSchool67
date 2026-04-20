@@ -32,10 +32,10 @@ export function NpcAvatar({
       const avatar = createAvatar(adventurer, {
         size: size * 2,
         seed,
-        hair,
+        hair: hair as any,
         hairColor: hexToDiceBear(hairColor),
         skinColor: hexToDiceBear(skinColor),
-        glasses,
+        glasses: glasses as any,
         glassesProbability: glasses ? 100 : 0,
         hairProbability: 100,
       });

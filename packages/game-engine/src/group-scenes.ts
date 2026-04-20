@@ -1,5 +1,6 @@
 import type {
   GroupScene,
+  GroupSceneChoice,
   NPC,
   GameProgress,
 } from '@repo/types'
@@ -666,7 +667,7 @@ export function getAvailableGroupScenes(
       for (const [stat, minVal] of Object.entries(
         scene.unlockConditions.minStats
       )) {
-        if ((playerStats[stat] ?? 0) < minVal) return false
+        if (minVal !== undefined && (playerStats[stat] ?? 0) < minVal) return false
       }
     }
 
@@ -726,7 +727,7 @@ export function processGroupSceneChoice(
   return {
     updatedNpcs,
     rewards: {
-      stats: choice.effects.playerStats,
+      stats: choice.effects.playerStats as Record<string, number> | undefined,
       description,
     },
   }
@@ -741,8 +742,8 @@ function buildRewardDescription(
 
   if (effects.playerStats) {
     const statEntries = Object.entries(effects.playerStats)
-      .filter(([, v]) => v !== 0)
-      .map(([k, v]) => `${k} ${v! > 0 ? '+' : ''}${v}`)
+      .filter(([, v]) => typeof v === 'number' && v !== 0)
+      .map(([k, v]) => `${k} ${(v as number) > 0 ? '+' : ''}${v}`)
     if (statEntries.length > 0) {
       parts.push(`Stats: ${statEntries.join(', ')}`)
     }
@@ -750,11 +751,12 @@ function buildRewardDescription(
 
   if (effects.npcRelationships) {
     const relEntries = Object.entries(effects.npcRelationships)
-      .filter(([, v]) => v.friendship || v.romance)
+      .filter(([, v]) => v && (v.friendship || v.romance))
       .map(([k, v]) => {
         const bits: string[] = []
-        if (v.friendship) bits.push(`friendship ${v.friendship > 0 ? '+' : ''}${v.friendship}`)
-        if (v.romance) bits.push(`romance ${v.romance > 0 ? '+' : ''}${v.romance}`)
+        const rel = v as { friendship?: number; romance?: number }
+        if (rel.friendship) bits.push(`friendship ${rel.friendship > 0 ? '+' : ''}${rel.friendship}`)
+        if (rel.romance) bits.push(`romance ${rel.romance > 0 ? '+' : ''}${rel.romance}`)
         return `${k}: ${bits.join(', ')}`
       })
     if (relEntries.length > 0) {
