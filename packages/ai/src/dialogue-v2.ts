@@ -1,4 +1,3 @@
-import OpenAI from 'openai'
 import type {
   EmotionState,
   EmotionType,
@@ -218,6 +217,7 @@ export async function generateDialogueV2(
   }
 
   try {
+    const { default: OpenAI } = await import('openai')
     const client = new OpenAI({ apiKey })
     const prompt = buildDialoguePrompt(context)
 

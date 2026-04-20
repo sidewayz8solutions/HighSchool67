@@ -1,5 +1,3 @@
-import OpenAI from 'openai'
-
 export interface NarrativeContext {
   playerName: string
   clique: string
@@ -14,6 +12,8 @@ export async function generateDialogue(context: NarrativeContext, apiKey?: strin
     return `Hey ${context.playerName}, what's up?`
   }
 
+  // Dynamic import to avoid bundler circular dependency issues with openai SDK
+  const { default: OpenAI } = await import('openai')
   const client = new OpenAI({ apiKey })
 
   const prompt = `
