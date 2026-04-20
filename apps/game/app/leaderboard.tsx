@@ -130,7 +130,7 @@ export default function LeaderboardScreen() {
   ].filter(Boolean) as LeaderboardEntry[];
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Leaderboard</Text>
         <Text style={styles.subtitle}>The best of the best. Where do you rank?</Text>

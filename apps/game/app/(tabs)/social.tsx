@@ -74,7 +74,7 @@ export default function SocialScreen() {
     : FRIENDS_PREVIEW;
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <Animated.View entering={FadeInUp.duration(400)}>
@@ -171,7 +171,7 @@ export default function SocialScreen() {
                 activeOpacity={0.7}
               >
                 <LinearGradient
-                  colors={colors.gradientGold as unknown as [string, string]}
+                  colors={colors.gradientGold }
                   style={styles.giftButtonGradient}
                 >
                   <Text style={styles.giftButtonText}>Send Gift</Text>

@@ -130,7 +130,7 @@ export default function TournamentScreen() {
   };
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Tournament Hub</Text>
         <Text style={styles.subtitle}>Compete weekly for glory and rewards.</Text>
@@ -232,7 +232,7 @@ export default function TournamentScreen() {
         {/* Play Button */}
         <TouchableOpacity style={styles.playBtn} onPress={handlePlayGame}>
           <LinearGradient
-            colors={colors.gradientPrimary as unknown as [string, string, string]}
+            colors={colors.gradientPrimary }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.playBtnGradient}

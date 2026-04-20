@@ -89,19 +89,41 @@ export default function RoomGridEditor() {
 
   const handleRotate = () => {
     if (!selectedPlaced) return;
-    // Swap width/height for rotation
-    const newWidth = selectedPlaced.gridSize?.height ?? 1;
-    const newHeight = selectedPlaced.gridSize?.width ?? 1;
+    const oldW = selectedPlaced.gridSize?.width ?? 1;
+    const oldH = selectedPlaced.gridSize?.height ?? 1;
+    const newWidth = oldH;
+    const newHeight = oldW;
 
     // Check if rotation is valid
     if (selectedPlaced.position.x + newWidth > GRID_SIZE || selectedPlaced.position.y + newHeight > GRID_SIZE) {
       return;
     }
 
-    // For simplicity, we'll remove and re-place with swapped dimensions
-    removeRoomItem(`${selectedPlaced.id}-${selectedPlaced.position.x}-${selectedPlaced.position.y}`);
-    // Since removeRoomItem uses id only, we need a different approach
-    // Actually, let me update the store to support rotation properly
+    // Check overlap with other items (excluding the one being rotated)
+    for (const placed of room.items) {
+      if (placed.id === selectedPlaced.id && placed.position.x === selectedPlaced.position.x && placed.position.y === selectedPlaced.position.y) {
+        continue;
+      }
+      const pw = placed.gridSize?.width ?? 1;
+      const ph = placed.gridSize?.height ?? 1;
+      if (
+        selectedPlaced.position.x < placed.position.x + pw &&
+        selectedPlaced.position.x + newWidth > placed.position.x &&
+        selectedPlaced.position.y < placed.position.y + ph &&
+        selectedPlaced.position.y + newHeight > placed.position.y
+      ) {
+        return; // Would overlap
+      }
+    }
+
+    // Remove old placement and add rotated version
+    removeRoomItem(selectedPlaced.id, { x: selectedPlaced.position.x, y: selectedPlaced.position.y });
+    placeRoomItem({
+      ...selectedPlaced,
+      gridSize: { width: newWidth, height: newHeight },
+      rotation: ((selectedPlaced.rotation ?? 0) + 90) % 360 as 0 | 90 | 180 | 270,
+      position: { x: selectedPlaced.position.x, y: selectedPlaced.position.y },
+    });
     setSelectedPlaced(null);
   };
 

@@ -35,11 +35,13 @@ export default function FootballTossScreen() {
   const ballX = useSharedValue(SCREEN_W / 2 - BALL_SIZE / 2);
   const ballY = useSharedValue(SCREEN_H - 200);
   const ballScale = useSharedValue(1);
+  const hasCheckedHit = useSharedValue(false);
 
   const resetBall = () => {
     ballX.value = SCREEN_W / 2 - BALL_SIZE / 2;
     ballY.value = SCREEN_H - 200;
     ballScale.value = withSpring(1);
+    hasCheckedHit.value = false;
   };
 
   const checkHit = (x: number, y: number) => {
@@ -82,13 +84,16 @@ export default function FootballTossScreen() {
       ballY.value = event.translationY + (SCREEN_H - 200);
     })
     .onEnd((event) => {
+      hasCheckedHit.value = false;
       ballX.value = withDecay({ velocity: event.velocityX, deceleration: 0.995 }, (finished) => {
-        if (finished) {
+        if (finished && !hasCheckedHit.value) {
+          hasCheckedHit.value = true;
           runOnJS(checkHit)(ballX.value, ballY.value);
         }
       });
       ballY.value = withDecay({ velocity: event.velocityY, deceleration: 0.995 }, (finished) => {
-        if (finished) {
+        if (finished && !hasCheckedHit.value) {
+          hasCheckedHit.value = true;
           runOnJS(checkHit)(ballX.value, ballY.value);
         }
       });

@@ -34,7 +34,7 @@ export default function RoomScreen() {
   };
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>My Room</Text>
         <Text style={styles.subtitle}>Customize your space to match your vibe.</Text>

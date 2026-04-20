@@ -29,7 +29,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <AvatarPreview config={player.avatarConfig} size={100} />

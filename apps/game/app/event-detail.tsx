@@ -64,7 +64,7 @@ export default function EventDetailScreen() {
   if (!event) {
     return (
       <LinearGradient
-        colors={colors.gradientDark as unknown as [string, string]}
+        colors={colors.gradientDark }
         style={styles.gradientBg}
       >
         <View style={styles.errorContainer}>
@@ -103,7 +103,7 @@ export default function EventDetailScreen() {
 
   return (
     <LinearGradient
-      colors={colors.gradientDark as unknown as [string, string]}
+      colors={colors.gradientDark }
       style={styles.gradientBg}
     >
       <ScrollView

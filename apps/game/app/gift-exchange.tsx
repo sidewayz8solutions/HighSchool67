@@ -154,7 +154,7 @@ export default function GiftExchangeScreen() {
   const recentGifts = selectedFriend?.giftHistory.slice(-5).reverse() ?? [];
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Gift Exchange</Text>
         <Text style={styles.subtitle}>Send gifts to friends and grow your bond!</Text>

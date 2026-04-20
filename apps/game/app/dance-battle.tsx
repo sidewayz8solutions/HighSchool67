@@ -93,15 +93,19 @@ export default function DanceBattleScreen() {
   useEffect(() => {
     if (!started || gameOver) return;
     const elapsed = SONG_DURATION - timeLeft;
+    let anyMissed = false;
     setNotes((prev) =>
       prev.map((note) => {
         if (!note.hit && !note.missed && elapsed > note.targetTime + 0.5) {
-          setCombo(0);
+          anyMissed = true;
           return { ...note, missed: true };
         }
         return note;
       })
     );
+    if (anyMissed) {
+      setCombo(0);
+    }
   }, [timeLeft, started, gameOver]);
 
   const endGame = () => {

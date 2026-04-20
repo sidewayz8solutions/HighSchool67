@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Button, Card, colors, radii, spacing } from '@repo/ui';
@@ -51,6 +51,7 @@ export default function MathBlitzScreen() {
 
   const [started, setStarted] = useState(false);
   const [score, setScore] = useState(0);
+  const scoreRef = useRef(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const [question, setQuestion] = useState<Question | null>(null);
   const [gameOver, setGameOver] = useState(false);
@@ -69,6 +70,7 @@ export default function MathBlitzScreen() {
     if (!spendEnergy(10)) return;
     setStarted(true);
     setScore(0);
+    scoreRef.current = 0;
     setTimeLeft(30);
     setGameOver(false);
     setQuestion(generateQuestion());
@@ -77,17 +79,22 @@ export default function MathBlitzScreen() {
   const answer = (value: number) => {
     if (!question || gameOver) return;
     if (value === question.answer) {
-      setScore((s) => s + 1);
+      setScore((s) => {
+        const next = s + 1;
+        scoreRef.current = next;
+        return next;
+      });
     }
     setQuestion(generateQuestion());
   };
 
   const endGame = () => {
     setGameOver(true);
-    const pointsEarned = score * 10;
+    const finalScore = scoreRef.current;
+    const pointsEarned = finalScore * 10;
     addCurrency({ points: pointsEarned });
-    modifyStats({ academics: Math.min(100, score) });
-    updateChallenge('c1', score >= 8 ? 80 : 0);
+    modifyStats({ academics: Math.min(100, finalScore) });
+    updateChallenge('c1', finalScore >= 8 ? 80 : 0);
   };
 
   if (!started || gameOver) {

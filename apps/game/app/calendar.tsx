@@ -94,7 +94,7 @@ export default function CalendarScreen() {
 
   return (
     <LinearGradient
-      colors={colors.gradientDark as unknown as [string, string]}
+      colors={colors.gradientDark }
       style={styles.gradientBg}
     >
       <ScrollView
@@ -160,7 +160,7 @@ export default function CalendarScreen() {
                   >
                     <LinearGradient
                       colors={
-                        colors.gradientSurface as unknown as [string, string]
+                        colors.gradientSurface 
                       }
                       style={styles.upcomingGradient}
                     >

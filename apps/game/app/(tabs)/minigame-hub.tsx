@@ -224,12 +224,12 @@ export default function MiniGameHubScreen() {
   const recentlyPlayed = GAMES.slice(0, 3); // Would come from actual play history
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header with gradient text */}
         <Animated.View entering={FadeInUp.duration(400)}>
           <LinearGradient
-            colors={colors.gradientPrimary as unknown as [string, string]}
+            colors={colors.gradientPrimary }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.titleGradient}

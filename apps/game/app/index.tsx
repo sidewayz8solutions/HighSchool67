@@ -68,7 +68,7 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn} style={styles.header}>
           <Text style={styles.title}>HIGH SCHOOL 67</Text>

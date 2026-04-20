@@ -192,7 +192,7 @@ export default function HomeScreen() {
   const atmosphereValue = atmosphere?.dominant ?? 'chill';
 
   return (
-    <LinearGradient colors={colors.gradientDark as unknown as [string, string]} style={styles.gradientBg}>
+    <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Particles active={particles} onComplete={() => setParticles(false)} />
 
