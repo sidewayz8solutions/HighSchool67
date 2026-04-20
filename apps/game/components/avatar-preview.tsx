@@ -27,36 +27,36 @@ interface AvatarPreviewProps {
 // ─── Avataaars Mappings ─────────────────────────────────────────────
 
 const TOP_MAP: Record<number, string[]> = {
-  0: ['shortRound'],        // Short
-  1: ['longButNotTooLong'], // Long
-  2: ['curly'],             // Curly
-  3: ['dreads'],            // Braids
-  4: [],                    // Bald
-  5: ['bun'],               // Bun
-  6: ['straightAndStrand'], // Ponytail
-  7: ['shavedSides'],       // Mohawk
+  0: ['shortRound'],        // Short — clean buzzed/rounded cut
+  1: ['longButNotTooLong'], // Long — longest hair avataaars has
+  2: ['curly'],             // Curly — medium curly volume
+  3: ['dreads01'],          // Braids — dreadlock variant closest to braids
+  4: [],                    // Bald — no top
+  5: ['bun'],               // Bun — hair tied up
+  6: ['straight01'],        // Ponytail — long straight, closest vibe
+  7: ['shavedSides'],       // Mohawk — shaved sides, longer top
 };
 
-const CLOTHING_MAP: Record<number, string[]> = {
-  0: ['hoodie'],            // Casual
-  1: ['graphicShirt'],      // Jock
-  2: ['blazerAndSweater'],  // Nerd
-  3: ['blazerAndShirt'],    // Goth
-  4: ['collarAndSweater'],  // Preppy
-  5: ['overall'],           // Artsy
-  6: ['shirtCrewNeck'],     // Street
-  7: ['shirtVNeck'],        // Vintage
+const CLOTHING_MAP: Record<number, { clothing: string[]; graphic?: string[] }> = {
+  0: { clothing: ['hoodie'] },
+  1: { clothing: ['graphicShirt'], graphic: ['bear'] },
+  2: { clothing: ['blazerAndSweater'] },
+  3: { clothing: ['hoodie'] },
+  4: { clothing: ['collarAndSweater'] },
+  5: { clothing: ['overall'] },
+  6: { clothing: ['shirtVNeck'] },
+  7: { clothing: ['shirtScoopNeck'] },
 };
 
 const ACCESSORY_MAP: Record<number, { type: 'accessories' | 'top'; value: string[]; color?: string }> = {
-  0: { type: 'accessories', value: [] },                           // None
-  1: { type: 'accessories', value: ['prescription02'] },           // Glasses
-  2: { type: 'accessories', value: ['sunglasses'] },               // Sunglasses
-  3: { type: 'accessories', value: ['kurt'] },                     // Headphones
-  4: { type: 'top', value: ['hat'], color: '262e33' },             // Hat
-  5: { type: 'top', value: ['winterHat1'], color: '262e33' },      // Beanie
-  6: { type: 'top', value: ['hat'], color: 'ffd700' },             // Crown (gold hat)
-  7: { type: 'accessories', value: ['eyepatch'] },                 // Mask -> eyepatch
+  0: { type: 'accessories', value: [] },
+  1: { type: 'accessories', value: ['prescription02'] },
+  2: { type: 'accessories', value: ['sunglasses'] },
+  3: { type: 'accessories', value: ['kurt'] },
+  4: { type: 'top', value: ['hat'], color: '262e33' },
+  5: { type: 'top', value: ['winterHat1'], color: '262e33' },
+  6: { type: 'top', value: ['hat'], color: 'ffd700' },
+  7: { type: 'accessories', value: ['eyepatch'] },
 };
 
 const EYES_MAP: Record<number, string[]> = {
@@ -87,6 +87,54 @@ function getClosestSkinTone(hex: string): string {
   return tones[hex.toLowerCase()] ?? hex.replace('#', '');
 }
 
+/**
+ * Post-process the avataaars SVG to recolor the eyes.
+ * Finds the eye group by its translate transform and replaces
+ * the baked-in fill colors with the player's chosen eye color.
+ */
+function recolorEyes(svg: string, eyeColor: string): string {
+  const eyeGroupStart = '<g transform="translate(76 90)">';
+  const startIdx = svg.indexOf(eyeGroupStart);
+  if (startIdx === -1) return svg;
+
+  let depth = 1;
+  let pos = startIdx + eyeGroupStart.length;
+
+  while (depth > 0 && pos < svg.length) {
+    const openIdx = svg.indexOf('<g', pos);
+    const closeIdx = svg.indexOf('</g>', pos);
+    if (closeIdx === -1) break;
+    if (openIdx !== -1 && openIdx < closeIdx) {
+      depth++;
+      pos = openIdx + 2;
+    } else {
+      depth--;
+      pos = closeIdx + 4;
+    }
+  }
+
+  const eyeGroupFull = svg.substring(startIdx, pos);
+  const innerStart = eyeGroupStart.length;
+  const innerEnd = eyeGroupFull.lastIndexOf('</g>');
+  const eyeContent = eyeGroupFull.substring(innerStart, innerEnd);
+
+  // If the eye variant doesn't already have a white sclera, add one
+  const hasWhiteSclera = eyeContent.includes('fill="#fff"');
+
+  let newEyeContent = eyeContent;
+  if (!hasWhiteSclera) {
+    newEyeContent = `<circle cx="30" cy="22" r="9" fill="#fff"/><circle cx="82" cy="22" r="9" fill="#fff"/>` + newEyeContent;
+  }
+
+  // Recolor the iris/pupil shapes to the chosen eye color
+  newEyeContent = newEyeContent
+    .replace(/fill="#000"/g, `fill="${eyeColor}"`)
+    .replace(/fill="#FF5353"/g, `fill="${eyeColor}"`);
+
+  const newEyeGroup = eyeGroupStart + newEyeContent + '</g>';
+  return svg.substring(0, startIdx) + newEyeGroup + svg.substring(pos);
+}
+
 export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
   const outfit = OUTFITS[config.outfit] ?? OUTFITS[0];
   const accessory = ACCESSORIES[config.accessory] ?? ACCESSORIES[0];
@@ -99,7 +147,6 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
   const glowIntensity = useSharedValue(0);
   const prevConfigRef = useRef(config);
 
-  // Start continuous idle animations on mount
   useEffect(() => {
     breath.value = withRepeat(
       withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
@@ -115,7 +162,6 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // React to config changes with a spring bounce + glow
   useEffect(() => {
     const prev = prevConfigRef.current;
     const changed = JSON.stringify(prev) !== JSON.stringify(config);
@@ -142,7 +188,7 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
     try {
       const hair = TOP_MAP[config.hairStyle] ?? TOP_MAP[0];
       const isBald = config.hairStyle === 4;
-      const clothing = CLOTHING_MAP[config.outfit] ?? CLOTHING_MAP[0];
+      const outfitDef = CLOTHING_MAP[config.outfit] ?? CLOTHING_MAP[0];
       const acc = ACCESSORY_MAP[config.accessory] ?? ACCESSORY_MAP[0];
       const eyes = EYES_MAP[config.hairStyle % Object.keys(EYES_MAP).length];
 
@@ -152,7 +198,7 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
         skinColor: [getClosestSkinTone(config.skinTone)],
         hairColor: hexToDiceBear(config.hairColor),
         clothesColor: hexToDiceBear(outfit.color),
-        clothing,
+        clothing: outfitDef.clothing,
         eyes,
         eyebrows: ['defaultNatural'],
         mouth: ['smile'],
@@ -160,7 +206,10 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
         backgroundColor: ['transparent'],
       };
 
-      // Hair / top
+      if (outfitDef.graphic) {
+        options.clothingGraphic = outfitDef.graphic;
+      }
+
       if (isBald) {
         options.top = [];
         options.topProbability = 0;
@@ -169,12 +218,10 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
         options.topProbability = 100;
       }
 
-      // Accessory handling
       if (acc.type === 'accessories') {
         options.accessories = acc.value;
         options.accessoriesProbability = acc.value.length > 0 ? 100 : 0;
       } else if (acc.type === 'top') {
-        // Hat/beanie overrides hair
         options.top = acc.value;
         options.topProbability = 100;
         if (acc.color) {
@@ -184,8 +231,12 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
         options.accessoriesProbability = 0;
       }
 
-      const avatar = createAvatar(avataaars, options);
-      return avatar.toString();
+      let svg = createAvatar(avataaars, options).toString();
+
+      // Apply custom eye color post-processing
+      svg = recolorEyes(svg, config.eyeColor);
+
+      return svg;
     } catch (e) {
       console.warn('Avatar generation failed:', e);
       return null;
@@ -207,9 +258,7 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
 
   const shadowAnimStyle = useAnimatedStyle(() => ({
     opacity: shadowPulse.value,
-    transform: [
-      { scale: interpolate(breath.value, [0, 1], [1, 1.05]) },
-    ],
+    transform: [{ scale: interpolate(breath.value, [0, 1], [1, 1.05]) }],
   }));
 
   const glowAnimStyle = useAnimatedStyle(() => ({
@@ -291,23 +340,10 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
         </View>
       </Animated.View>
 
-      {/* Eye color indicator */}
-      <View
-        style={[
-          styles.eyeIndicator,
-          {
-            backgroundColor: config.eyeColor,
-            borderColor: colors.surface,
-            bottom: size * 0.12,
-          },
-        ]}
-      />
-
       {/* Outfit badge */}
       <Animated.View
         style={[
           styles.badge,
-          styles.outfitBadge,
           {
             backgroundColor: colors.surface,
             top: size * 0.02,
@@ -323,7 +359,6 @@ export function AvatarPreview({ config, size = 200 }: AvatarPreviewProps) {
         <Animated.View
           style={[
             styles.badge,
-            styles.accessoryBadge,
             {
               backgroundColor: colors.surface,
               bottom: size * 0.02,
@@ -364,14 +399,6 @@ const styles = StyleSheet.create({
   fallback: {
     backgroundColor: colors.surfaceHighlight,
   },
-  eyeIndicator: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 2,
-    zIndex: 10,
-  },
   badge: {
     position: 'absolute',
     width: 36,
@@ -383,8 +410,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.12)',
     zIndex: 10,
   },
-  outfitBadge: {},
-  accessoryBadge: {},
   badgeEmoji: {
     fontSize: 18,
   },
