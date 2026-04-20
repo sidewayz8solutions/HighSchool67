@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@repo/ui';
 import type { AvatarConfig } from '@repo/types';
+import { OUTFITS, ACCESSORIES } from '@repo/types';
 import { createAvatar } from '@dicebear/core';
 import * as adventurer from '@dicebear/adventurer';
 
@@ -12,7 +13,8 @@ interface AvatarPreviewProps {
   size?: number;
 }
 
-const HAIR_MAP: Record<number, ("short01" | "short02" | "short03" | "short04" | "short05" | "short06" | "short07" | "short08" | "short09" | "short10" | "short11" | "short12" | "short13" | "short14" | "short15" | "short16" | "long01" | "long02" | "long03" | "long04" | "long05" | "long06" | "long07" | "long08" | "long09" | "long10" | "long11" | "long12" | "long13" | "long14" | "long15" | "long16" | "long17" | "long18" | "long19" | "long20" | "long21")[]> = {
+// DiceBear adventurer hair style mapping
+const HAIR_MAP: Record<number, string[]> = {
   0: ['short01'], // Short
   1: ['long01'],  // Long
   2: ['long06'],  // Curly
@@ -23,7 +25,9 @@ const HAIR_MAP: Record<number, ("short01" | "short02" | "short03" | "short04" | 
   7: ['short11'], // Mohawk
 };
 
-const GLASSES_MAP: Record<number, ('variant01' | 'variant03' | 'variant02' | 'variant04' | 'variant05')[]> = {
+// Only glasses/sunglasses are supported by DiceBear adventurer
+const GLASSES_MAP: Record<number, string[]> = {
+  0: [],           // None
   1: ['variant01'], // Glasses
   2: ['variant03'], // Sunglasses
 };
@@ -33,45 +37,92 @@ function hexToDiceBear(hex: string): string[] {
 }
 
 export function AvatarPreview({ config, size = 180 }: AvatarPreviewProps) {
+  const outfit = OUTFITS[config.outfit] ?? OUTFITS[0];
+  const accessory = ACCESSORIES[config.accessory] ?? ACCESSORIES[0];
+
   const svgString = useMemo(() => {
     try {
       const hair = HAIR_MAP[config.hairStyle] ?? HAIR_MAP[0];
       const isBald = config.hairStyle === 4;
       const glasses = GLASSES_MAP[config.accessory];
 
-      const options = {
+      const avatar = createAvatar(adventurer, {
         size: size * 2,
+        seed: `hs67-${config.gender}-${config.skinTone}-${config.hairStyle}-${config.hairColor}`,
         hair: isBald ? [] : hair,
         hairColor: hexToDiceBear(config.hairColor),
         skinColor: hexToDiceBear(config.skinTone),
         glasses: glasses || [],
-        seed: `${config.gender}-${config.skinTone}-${config.hairStyle}-${config.hairColor}-${config.eyeColor}-${config.outfit}-${config.accessory}`,
-      } as any;
+        glassesProbability: glasses && glasses.length > 0 ? 100 : 0,
+        hairProbability: isBald ? 0 : 100,
+      } as any);
 
-      const avatar = createAvatar(adventurer, options);
       return avatar.toString();
     } catch (e) {
       console.warn('Avatar generation failed:', e);
       return null;
     }
-  }, [config, size]);
+  }, [config.gender, config.skinTone, config.hairStyle, config.hairColor, config.accessory, size]);
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
-      <LinearGradient
-        colors={['#1e1e2e', '#0a0a0f']}
-        style={[styles.bg, { borderRadius: size / 2 }]}
+      {/* Outfit color ring */}
+      <View
+        style={[
+          styles.outfitRing,
+          {
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: outfit.color,
+          },
+        ]}
+      />
+
+      {/* Main avatar circle */}
+      <View
+        style={[
+          styles.avatarCircle,
+          {
+            width: size * 0.92,
+            height: size * 0.92,
+            borderRadius: size * 0.46,
+          },
+        ]}
       >
-        <View style={[styles.glowRing, { width: size * 0.95, height: size * 0.95, borderRadius: size * 0.475 }]} />
+        <LinearGradient
+          colors={['#1e1e2e', '#0a0a0f']}
+          style={StyleSheet.absoluteFill}
+        />
 
         {svgString ? (
-          <View style={{ width: size * 0.9, height: size * 0.9 }}>
-            <SvgXml xml={svgString} width={size * 0.9} height={size * 0.9} />
+          <View style={{ width: size * 0.85, height: size * 0.85 }}>
+            <SvgXml xml={svgString} width={size * 0.85} height={size * 0.85} />
           </View>
         ) : (
           <View style={[styles.fallback, { width: size * 0.5, height: size * 0.5, borderRadius: size * 0.25 }]} />
         )}
-      </LinearGradient>
+      </View>
+
+      {/* Eye color indicator */}
+      <View
+        style={[
+          styles.eyeIndicator,
+          { backgroundColor: config.eyeColor, borderColor: colors.surface },
+        ]}
+      />
+
+      {/* Outfit badge */}
+      <View style={[styles.outfitBadge, { backgroundColor: colors.surface }]}>
+        <Text style={styles.badgeEmoji}>{outfit.emoji}</Text>
+      </View>
+
+      {/* Accessory badge (if not None) */}
+      {config.accessory !== 0 && (
+        <View style={[styles.accessoryBadge, { backgroundColor: colors.surface }]}>
+          <Text style={styles.badgeEmoji}>{accessory.emoji}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -80,21 +131,54 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
-  bg: {
-    width: '100%',
-    height: '100%',
+  outfitRing: {
+    position: 'absolute',
+    opacity: 0.6,
+  },
+  avatarCircle: {
+    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
     overflow: 'hidden',
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.08)',
   },
-  glowRing: {
+  eyeIndicator: {
     position: 'absolute',
+    bottom: '8%',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     borderWidth: 2,
-    borderColor: colors.primaryGlow,
+  },
+  outfitBadge: {
+    position: 'absolute',
+    top: '5%',
+    right: '5%',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  accessoryBadge: {
+    position: 'absolute',
+    bottom: '5%',
+    right: '5%',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  badgeEmoji: {
+    fontSize: 16,
   },
   fallback: {
     backgroundColor: colors.surfaceHighlight,

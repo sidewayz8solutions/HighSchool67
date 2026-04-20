@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,11 +13,9 @@ import { Card, Button, colors, spacing, radii } from '@repo/ui';
 import {
   useGameStore,
   getAvailableCareers,
-  getCurrentCareer,
   getCareerRecommendation,
   CAREER_PATHS,
 } from '@repo/game-engine';
-import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -46,48 +44,42 @@ const CAREER_COLORS: Record<string, readonly [string, string]> = {
 
 export default function CareerScreen() {
   const router = useRouter();
-  const [selectedCareerId, setSelectedCareerId] = useState<string | null>(null);
+  const [claimMessage, setClaimMessage] = useState('');
 
-  const {
-    player,
-    careerPaths,
-    currentCareerId,
-    selectCareer,
-    checkCareerMilestones,
-  } = useGameStore((s) => ({
-    player: s.player,
-    careerPaths: s.careerPaths,
-    currentCareerId: s.currentCareerId,
-    selectCareer: s.selectCareer,
-    checkCareerMilestones: s.checkCareerMilestones,
-  }));
+  // Use individual selectors to avoid object reference churn
+  const player = useGameStore((s) => s.player);
+  const careerPaths = useGameStore((s) => s.careerPaths);
+  const currentCareerId = useGameStore((s) => s.currentCareerId);
+  const selectCareer = useGameStore((s) => s.selectCareer);
+  const checkCareerMilestones = useGameStore((s) => s.checkCareerMilestones);
 
-  const availableCareers = useMemo(
-    () => getAvailableCareers(player),
-    [player]
+  const availableCareers = getAvailableCareers(player);
+  const currentCareer = currentCareerId
+    ? careerPaths.find((c) => c.id === currentCareerId) ?? null
+    : null;
+  const recommendation = getCareerRecommendation(player);
+
+  const handleSelectCareer = useCallback(
+    (careerId: string) => {
+      selectCareer(careerId);
+      setClaimMessage('Career selected!');
+      setTimeout(() => setClaimMessage(''), 2000);
+    },
+    [selectCareer]
   );
 
-  const currentCareer = useMemo(
-    () => (currentCareerId ? careerPaths.find((c) => c.id === currentCareerId) ?? null : null),
-    [careerPaths, currentCareerId]
-  );
-
-  const recommendation = useMemo(
-    () => getCareerRecommendation(player),
-    [player]
-  );
-
-  const handleSelectCareer = (careerId: string) => {
-    selectCareer(careerId);
-    setSelectedCareerId(careerId);
-  };
-
-  const handleCheckMilestones = () => {
+  const handleCheckMilestones = useCallback(() => {
     const result = checkCareerMilestones();
     if (result.newlyCompleted.length > 0) {
-      // Could show a toast here
+      setClaimMessage(
+        `${result.newlyCompleted.length} milestone(s) completed! +${result.rewards.points} pts`
+      );
+      setTimeout(() => setClaimMessage(''), 3000);
+    } else {
+      setClaimMessage('No new milestones yet. Keep grinding!');
+      setTimeout(() => setClaimMessage(''), 2000);
     }
-  };
+  }, [checkCareerMilestones]);
 
   return (
     <LinearGradient colors={colors.gradientDark} style={styles.gradientBg}>
@@ -96,162 +88,157 @@ export default function CareerScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Animated.View entering={FadeInUp.duration(400)}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-              <Ionicons name="arrow-back" size={24} color={colors.text} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Career Paths</Text>
-            <View style={{ width: 40 }} />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Career Paths</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <Text style={styles.subtitle}>
+          Choose your destiny. Each path unlocks unique milestones and rewards.
+        </Text>
+
+        {/* Toast message */}
+        {claimMessage !== '' && (
+          <View style={styles.toast}>
+            <Text style={styles.toastText}>{claimMessage}</Text>
           </View>
-          <Text style={styles.subtitle}>
-            Choose your destiny. Each path unlocks unique milestones and rewards.
-          </Text>
-        </Animated.View>
+        )}
 
         {/* Current Career */}
         {currentCareer && (
-          <Animated.View entering={FadeInUp.delay(100).duration(400)}>
-            <Card style={styles.currentCareerCard} glow>
-              <LinearGradient
-                colors={CAREER_COLORS[currentCareer.id] ?? colors.gradientPrimary}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.currentCareerGradient}
-              >
-                <Text style={styles.currentCareerEmoji}>
-                  {CAREER_EMOJI[currentCareer.id] ?? '⭐'}
-                </Text>
-                <Text style={styles.currentCareerTitle}>{currentCareer.name}</Text>
-                <Text style={styles.currentCareerDesc}>{currentCareer.description}</Text>
-              </LinearGradient>
+          <Card style={styles.currentCareerCard} glow>
+            <LinearGradient
+              colors={CAREER_COLORS[currentCareer.id] ?? colors.gradientPrimary}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.currentCareerGradient}
+            >
+              <Text style={styles.currentCareerEmoji}>
+                {CAREER_EMOJI[currentCareer.id] ?? '⭐'}
+              </Text>
+              <Text style={styles.currentCareerTitle}>{currentCareer.name}</Text>
+              <Text style={styles.currentCareerDesc}>{currentCareer.description}</Text>
+            </LinearGradient>
 
-              <View style={styles.milestoneSection}>
-                <Text style={styles.milestoneHeader}>Milestones</Text>
-                {currentCareer.milestones.map((m, idx) => (
-                  <View key={m.id} style={styles.milestoneRow}>
-                    <View
+            <View style={styles.milestoneSection}>
+              <Text style={styles.milestoneHeader}>Milestones</Text>
+              {currentCareer.milestones.map((m, idx) => (
+                <View key={m.id} style={styles.milestoneRow}>
+                  <View
+                    style={[
+                      styles.milestoneDot,
+                      m.completed && styles.milestoneDotCompleted,
+                      idx === currentCareer.currentMilestone && !m.completed && styles.milestoneDotActive,
+                    ]}
+                  />
+                  <View style={styles.milestoneInfo}>
+                    <Text
                       style={[
-                        styles.milestoneDot,
-                        m.completed && styles.milestoneDotCompleted,
-                        idx === currentCareer.currentMilestone && !m.completed && styles.milestoneDotActive,
+                        styles.milestoneName,
+                        m.completed && styles.milestoneNameCompleted,
                       ]}
-                    />
-                    <View style={styles.milestoneInfo}>
-                      <Text
-                        style={[
-                          styles.milestoneName,
-                          m.completed && styles.milestoneNameCompleted,
-                        ]}
-                      >
-                        {m.name}
-                      </Text>
-                      <Text style={styles.milestoneDesc}>{m.description}</Text>
-                      {m.completed && m.reward.title && (
-                        <Text style={styles.milestoneReward}>🏅 {m.reward.title}</Text>
-                      )}
-                    </View>
+                    >
+                      {m.name}
+                    </Text>
+                    <Text style={styles.milestoneDesc}>{m.description}</Text>
+                    {m.completed && m.reward.title && (
+                      <Text style={styles.milestoneReward}>🏅 {m.reward.title}</Text>
+                    )}
                   </View>
-                ))}
-                <Button
-                  title="Check Milestones"
-                  variant="primary"
-                  onPress={handleCheckMilestones}
-                  style={styles.checkBtn}
-                />
-              </View>
-            </Card>
-          </Animated.View>
+                </View>
+              ))}
+              <Button
+                title="Check Milestones"
+                variant="primary"
+                onPress={handleCheckMilestones}
+                style={styles.checkBtn}
+              />
+            </View>
+          </Card>
         )}
 
         {/* Recommendation */}
         {recommendation && !currentCareerId && (
-          <Animated.View entering={FadeInUp.delay(150).duration(400)}>
-            <Card style={styles.recommendationCard}>
-              <Text style={styles.recommendationLabel}>Recommended for you</Text>
-              <View style={styles.recommendationRow}>
-                <Text style={styles.recommendationEmoji}>
-                  {CAREER_EMOJI[recommendation.id] ?? '⭐'}
-                </Text>
-                <View style={styles.recommendationInfo}>
-                  <Text style={styles.recommendationName}>{recommendation.name}</Text>
-                  <Text style={styles.recommendationDesc}>{recommendation.description}</Text>
-                </View>
+          <Card style={styles.recommendationCard}>
+            <Text style={styles.recommendationLabel}>Recommended for you</Text>
+            <View style={styles.recommendationRow}>
+              <Text style={styles.recommendationEmoji}>
+                {CAREER_EMOJI[recommendation.id] ?? '⭐'}
+              </Text>
+              <View style={styles.recommendationInfo}>
+                <Text style={styles.recommendationName}>{recommendation.name}</Text>
+                <Text style={styles.recommendationDesc}>{recommendation.description}</Text>
               </View>
-            </Card>
-          </Animated.View>
+            </View>
+          </Card>
         )}
 
         {/* Career Grid */}
-        <Animated.View entering={FadeInUp.delay(200).duration(400)}>
-          <Text style={styles.sectionTitle}>Available Paths</Text>
-          <View style={styles.careerGrid}>
-            {CAREER_PATHS.map((career, index) => {
-              const isAvailable = availableCareers.some((c) => c.id === career.id);
-              const isSelected = currentCareerId === career.id;
-              const isRecommended = recommendation?.id === career.id;
+        <Text style={styles.sectionTitle}>Available Paths</Text>
+        <View style={styles.careerGrid}>
+          {CAREER_PATHS.map((career) => {
+            const isAvailable = availableCareers.some((c) => c.id === career.id);
+            const isSelected = currentCareerId === career.id;
+            const isRecommended = recommendation?.id === career.id;
 
-              return (
-                <Animated.View
-                  key={career.id}
-                  entering={FadeIn.delay(index * 50)}
-                  style={styles.careerCardWrapper}
+            return (
+              <TouchableOpacity
+                key={career.id}
+                onPress={() => isAvailable && handleSelectCareer(career.id)}
+                activeOpacity={0.8}
+                disabled={!isAvailable}
+                style={styles.careerCardWrapper}
+              >
+                <Card
+                  style={[
+                    styles.careerCard,
+                    !isAvailable && styles.careerCardLocked,
+                    isSelected && styles.careerCardSelected,
+                  ]}
                 >
-                  <TouchableOpacity
-                    onPress={() => isAvailable && handleSelectCareer(career.id)}
-                    activeOpacity={0.8}
-                    disabled={!isAvailable}
+                  <LinearGradient
+                    colors={CAREER_COLORS[career.id] ?? colors.gradientPrimary}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.careerCardGradient}
                   >
-                    <Card
-                      style={[
-                        styles.careerCard,
-                        !isAvailable && styles.careerCardLocked,
-                        isSelected && styles.careerCardSelected,
-                      ]}
-                    >
-                      <LinearGradient
-                        colors={CAREER_COLORS[career.id] ?? colors.gradientPrimary}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.careerCardGradient}
-                      >
-                        <Text style={styles.careerEmoji}>
-                          {CAREER_EMOJI[career.id] ?? '⭐'}
-                        </Text>
-                        {isRecommended && !isSelected && (
-                          <View style={styles.recommendedBadge}>
-                            <Text style={styles.recommendedText}>Recommended</Text>
-                          </View>
-                        )}
-                        {isSelected && (
-                          <View style={styles.selectedBadge}>
-                            <Text style={styles.selectedText}>Active</Text>
-                          </View>
-                        )}
-                        {!isAvailable && (
-                          <View style={styles.lockedOverlay}>
-                            <Ionicons name="lock-closed" size={24} color="rgba(255,255,255,0.6)" />
-                          </View>
-                        )}
-                      </LinearGradient>
-                      <View style={styles.careerInfo}>
-                        <Text style={styles.careerName}>{career.name}</Text>
-                        <Text style={styles.careerDesc} numberOfLines={2}>
-                          {career.description}
-                        </Text>
-                        <View style={styles.requirementRow}>
-                          <Text style={styles.requirementText}>
-                            Requires: {career.requirements.dominantStat} {career.requirements.minValue}+
-                          </Text>
-                        </View>
+                    <Text style={styles.careerEmoji}>
+                      {CAREER_EMOJI[career.id] ?? '⭐'}
+                    </Text>
+                    {isRecommended && !isSelected && (
+                      <View style={styles.recommendedBadge}>
+                        <Text style={styles.recommendedText}>Recommended</Text>
                       </View>
-                    </Card>
-                  </TouchableOpacity>
-                </Animated.View>
-              );
-            })}
-          </View>
-        </Animated.View>
+                    )}
+                    {isSelected && (
+                      <View style={styles.selectedBadge}>
+                        <Text style={styles.selectedText}>Active</Text>
+                      </View>
+                    )}
+                    {!isAvailable && (
+                      <View style={styles.lockedOverlay}>
+                        <Ionicons name="lock-closed" size={24} color="rgba(255,255,255,0.6)" />
+                      </View>
+                    )}
+                  </LinearGradient>
+                  <View style={styles.careerInfo}>
+                    <Text style={styles.careerName}>{career.name}</Text>
+                    <Text style={styles.careerDesc} numberOfLines={2}>
+                      {career.description}
+                    </Text>
+                    <View style={styles.requirementRow}>
+                      <Text style={styles.requirementText}>
+                        Requires: {career.requirements.dominantStat} {career.requirements.minValue}+
+                      </Text>
+                    </View>
+                  </View>
+                </Card>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -292,6 +279,18 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginBottom: spacing.lg,
     lineHeight: 20,
+  },
+  toast: {
+    backgroundColor: colors.primary,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    alignItems: 'center',
+  },
+  toastText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
   },
   sectionTitle: {
     fontSize: 18,
