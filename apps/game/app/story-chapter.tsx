@@ -5,9 +5,11 @@ import { Card, Button, colors, spacing } from '@repo/ui';
 import { useGameStore, STORY_CHAPTERS, getCurrentScene } from '@repo/game-engine';
 import { generateDialogue } from '@repo/ai';
 import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { StoryChoice } from '@repo/types';
 
 export default function StoryChapterScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { chapterId } = useLocalSearchParams<{ chapterId: string }>();
   const chapter = STORY_CHAPTERS.find((c) => c.id === chapterId);
@@ -71,7 +73,7 @@ export default function StoryChapterScreen() {
 
   if (!chapter) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.error}>Chapter not found.</Text>
         <Button title="Go Back" onPress={() => router.back()} />
       </View>
@@ -109,7 +111,7 @@ export default function StoryChapterScreen() {
 
   if (!currentScene) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.error}>No scenes available.</Text>
         <Button title="Go Back" onPress={() => router.back()} />
       </View>
@@ -182,7 +184,6 @@ export default function StoryChapterScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: spacing.md,
-    paddingTop: 48,
     backgroundColor: colors.background,
   },
   chapterTitle: {

@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import { AvatarPreview } from '@/components/avatar-preview';
@@ -9,6 +10,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useCloudSync } from '@/hooks/use-cloud-sync';
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const player = useGameStore((s) => s.player);
   const progress = useGameStore((s) => s.progress);
@@ -30,7 +32,7 @@ export default function ProfileScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <AvatarPreview config={player.avatarConfig} size={100} />
           <Text style={styles.name}>{player.name}</Text>
@@ -95,7 +97,7 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60, alignItems: 'center' },
+  container: { padding: spacing.lg, alignItems: 'center' },
   header: { alignItems: 'center', marginBottom: spacing.lg },
   name: { fontSize: 24, fontWeight: '800', color: colors.text, marginTop: spacing.sm },
   clique: { fontSize: 16, color: colors.primaryLight, fontWeight: '600', textTransform: 'capitalize' },

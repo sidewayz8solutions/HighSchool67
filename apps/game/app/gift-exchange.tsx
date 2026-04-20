@@ -12,14 +12,13 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Card, colors, spacing } from '@repo/ui';
 import {
-  MOCK_FRIENDS,
   canSendGift,
   getRemainingGifts,
-  sendGift,
   useGameStore,
 } from '@repo/game-engine';
 import { NpcAvatar } from '@/components/visuals';
 import Animated, { FadeInUp, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RoomItem } from '@repo/types';
 import type { Friend } from '@repo/game-engine';
 
@@ -110,20 +109,22 @@ function getItemEmoji(category: string): string {
 }
 
 export default function GiftExchangeScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams();
   const inventory = useGameStore((s) => s.player.inventory);
+  const friends = useGameStore((s) => s.friends);
+  const sendGiftToFriend = useGameStore((s) => s.sendGiftToFriend);
 
-  const [friends, setFriends] = useState<Friend[]>(MOCK_FRIENDS);
   const [selectedFriendId, setSelectedFriendId] = useState<string>(
-    (params.friendId as string) ?? MOCK_FRIENDS[0].id
+    (params.friendId as string) ?? friends[0]?.id ?? ''
   );
   const [selectedItem, setSelectedItem] = useState<RoomItem | null>(null);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
 
   const selectedFriend = friends.find((f) => f.id === selectedFriendId) ?? friends[0];
   const giftableItems = inventory.length > 0 ? inventory : getMockGiftableItems();
-  const remainingGifts = getRemainingGifts(selectedFriend);
+  const remainingGifts = selectedFriend ? getRemainingGifts(selectedFriend) : 0;
 
   const handleSelectItem = useCallback((item: RoomItem) => {
     setSelectedItem(item);
@@ -137,14 +138,10 @@ export default function GiftExchangeScreen() {
       return;
     }
 
-    const result = sendGift(selectedFriend, selectedItem);
-    setFriends((prev) =>
-      prev.map((f) => (f.id === selectedFriend.id ? result.updatedFriend : f))
-    );
-
+    sendGiftToFriend(selectedFriend.id, selectedItem);
     setConfirmModalVisible(false);
     setSelectedItem(null);
-  }, [selectedItem, selectedFriend]);
+  }, [selectedItem, selectedFriend, sendGiftToFriend]);
 
   const getRandomReaction = (friendName: string): string => {
     const reactions = FRIEND_REACTIONS[friendName] ?? ['Thanks for the gift!'];
@@ -155,7 +152,7 @@ export default function GiftExchangeScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Gift Exchange</Text>
         <Text style={styles.subtitle}>Send gifts to friends and grow your bond!</Text>
 
@@ -297,7 +294,7 @@ export default function GiftExchangeScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
   subtitle: { fontSize: 16, color: colors.textMuted, marginBottom: spacing.lg },
   sectionLabel: {

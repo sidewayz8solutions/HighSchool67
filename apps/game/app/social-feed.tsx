@@ -19,6 +19,7 @@ import {
 } from '@repo/game-engine';
 import { NpcAvatar } from '@/components/visuals';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { SocialFeedItem, SocialComment } from '@repo/game-engine';
 
 const ACTOR_AVATARS: Record<string, { seed: string; hair: string[]; hairColor: string; skinColor: string }> = {
@@ -75,6 +76,7 @@ function HeartAnimation({ active }: { active: boolean }) {
 }
 
 export default function SocialFeedScreen() {
+  const insets = useSafeAreaInsets();
   const player = useGameStore((s) => s.player);
   const [feedItems, setFeedItems] = useState<SocialFeedItem[]>(MOCK_FEED_ITEMS);
   const [refreshing, setRefreshing] = useState(false);
@@ -130,7 +132,7 @@ export default function SocialFeedScreen() {
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
@@ -215,7 +217,7 @@ export default function SocialFeedScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
   subtitle: { fontSize: 16, color: colors.textMuted, marginBottom: spacing.lg },
   feedCard: { marginBottom: spacing.md, overflow: 'hidden' },

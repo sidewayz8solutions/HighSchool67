@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, { FlipInEasyX, FlipOutEasyX, BounceIn } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const CARD_SIZE = (SCREEN_W - spacing.md * 2 - 12 * 3) / 4;
@@ -29,6 +30,7 @@ function generateCards(): CardData[] {
 }
 
 export default function MemoryMatchScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -123,7 +125,7 @@ export default function MemoryMatchScreen() {
 
   if (!started || gameOver) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.title}>Memory Match</Text>
         <Text style={styles.subtitle}>Find all matching pairs before time runs out!</Text>
         <Card style={styles.card}>
@@ -141,8 +143,8 @@ export default function MemoryMatchScreen() {
   }
 
   return (
-    <View style={styles.gameContainer}>
-      <View style={styles.hud}>
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={styles.hudText}>⏱ {timeLeft}s</Text>
         <Text style={styles.hudText}>Matches: {matches}/{EMOJIS.length}</Text>
         <Text style={styles.hudText}>Moves: {moves}</Text>
@@ -184,7 +186,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -214,7 +215,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
   },
   hud: {
     flexDirection: 'row',

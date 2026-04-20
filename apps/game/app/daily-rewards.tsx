@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -251,6 +252,7 @@ function MonthlyBonus({ streak }: { streak: LoginStreak }) {
 // ─── Daily Rewards Screen ───────────────────────────────────────────
 
 export default function DailyRewardsScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [claimMessage, setClaimMessage] = useState('');
 
@@ -310,13 +312,13 @@ export default function DailyRewardsScreen() {
   const todayReward = rewards.find((r) => r.day === streakStatus.currentDay);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       {/* Header */}
       <LinearGradient
         colors={colors.gradientPrimary}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.headerGradient}
+        style={[styles.headerGradient, { paddingTop: Math.max(insets.top, 16) + 12 }]}
       >
         <View style={styles.headerContent}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -447,7 +449,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   headerGradient: {
-    paddingTop: 48,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.lg,
   },

@@ -4,8 +4,10 @@ import { useRouter } from 'expo-router';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { usePurchases } from '@/hooks/use-purchases';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SeasonPassScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { tiers, customerInfo, loading, purchasing, hasPass, hasVIP, purchase, restore } = usePurchases();
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -111,7 +113,6 @@ export default function SeasonPassScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: spacing.md,
-    paddingTop: 48,
     backgroundColor: colors.background,
   },
   header: {

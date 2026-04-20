@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, Card, colors, spacing } from '@repo/ui';
@@ -8,6 +8,7 @@ import { AvatarPreview } from '@/components/avatar-preview';
 import type { Clique, AvatarConfig, Gender } from '@repo/types';
 import { SKIN_TONES, HAIR_COLORS, EYE_COLORS, HAIR_STYLES, OUTFITS, ACCESSORIES } from '@repo/types';
 import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CLIQUES: { key: Clique; label: string; desc: string; gradient: readonly [string, string]; icon: string }[] = [
   { key: 'jock', label: 'Jock', desc: 'Athletic, competitive, popular with sports crowds.', gradient: ['#ef4444', '#f97316'], icon: 'J' },
@@ -41,6 +42,7 @@ function ColorSwatch({ color, selected, onPress }: { color: string; selected: bo
 }
 
 export default function WelcomeScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const initGame = useGameStore((s) => s.initGame);
   const [name, setName] = useState('');
@@ -69,7 +71,11 @@ export default function WelcomeScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeIn} style={styles.header}>
           <Text style={styles.title}>HIGH SCHOOL 67</Text>
           <Text style={styles.subtitle}>Create your legend</Text>
@@ -206,13 +212,14 @@ export default function WelcomeScreen() {
           />
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   header: { alignItems: 'center', marginBottom: spacing.lg },
   title: { fontSize: 36, fontWeight: '900', color: colors.text },
   subtitle: { fontSize: 16, color: colors.textMuted, marginTop: 4 },

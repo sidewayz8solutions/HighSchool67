@@ -5,6 +5,7 @@ import { Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import { AnimatedPortrait } from '@/components/visuals';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -57,6 +58,7 @@ function SeeAllButton({ onPress }: { onPress: () => void }) {
 // ─── Main Screen ──────────────────────────────────────────────────
 
 export default function SocialScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const npcs = useGameStore((s) => s.npcs);
   const unlockedNpcs = npcs.filter((n) => n.unlocked).slice(0, 5);
@@ -75,7 +77,7 @@ export default function SocialScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <Animated.View entering={FadeInUp.duration(400)}>
           <View style={styles.headerRow}>
@@ -231,7 +233,7 @@ export default function SocialScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
 
   headerRow: {
     flexDirection: 'row',

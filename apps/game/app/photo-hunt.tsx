@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing, radii } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, {
@@ -75,6 +76,7 @@ const MAX_HINTS = 3;
 // ─── Component ──────────────────────────────────────────────────────
 
 export default function PhotoHuntScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -248,7 +250,7 @@ export default function PhotoHuntScreen() {
 
   if (gameState === 'idle' || gameState === 'gameover') {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Animated.View entering={FadeInUp.duration(400)}>
           <Text style={styles.title}>Photo Hunt</Text>
         </Animated.View>
@@ -307,9 +309,9 @@ export default function PhotoHuntScreen() {
   // ─── Render: Playing ──────────────────────────────────────────────
 
   return (
-    <View style={styles.gameContainer}>
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       {/* HUD */}
-      <View style={styles.hud}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={[styles.hudTimer, { color: timeLeft <= 10 ? colors.danger : colors.warning }]}>
           {timeLeft}s
         </Text>
@@ -400,7 +402,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -482,7 +483,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
   },
   hud: {
     flexDirection: 'row',

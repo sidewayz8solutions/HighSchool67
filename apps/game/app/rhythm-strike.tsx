@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing, radii } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, {
@@ -52,6 +53,7 @@ const LANE_COLORS = ['#ec4899', '#3b82f6', '#a855f7', '#22c55e'];
 const LANE_LABELS = ['A', 'B', 'C', 'D'];
 
 export default function RhythmStrikeScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -289,7 +291,7 @@ export default function RhythmStrikeScreen() {
 
   if (gameState === 'idle' || gameState === 'gameover') {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Animated.View entering={FadeInUp.duration(400)}>
           <Text style={styles.title}>Rhythm Strike</Text>
         </Animated.View>
@@ -385,9 +387,9 @@ export default function RhythmStrikeScreen() {
   // ─── Render: Playing ──────────────────────────────────────────────
 
   return (
-    <View style={styles.gameContainer}>
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       {/* HUD */}
-      <View style={styles.hud}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={styles.hudSong}>{song.name}</Text>
         <Text style={[styles.hudTimer, { color: timeLeft <= 5 ? colors.danger : colors.text }]}>
           {Math.ceil(timeLeft)}s
@@ -497,7 +499,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -620,7 +621,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: spacing.md,
-    paddingTop: 48,
     paddingBottom: spacing.sm,
   },
   hudSong: {

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, {
@@ -32,6 +33,7 @@ const BPM = 120;
 const BEAT_INTERVAL = 60 / BPM;
 
 export default function DanceBattleScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -162,7 +164,7 @@ export default function DanceBattleScreen() {
 
   if (!started || gameOver) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.title}>Dance Battle</Text>
         <Text style={styles.subtitle}>Hit the notes as they reach the target line. Build your combo!</Text>
         <Card style={styles.card}>
@@ -180,8 +182,8 @@ export default function DanceBattleScreen() {
   }
 
   return (
-    <View style={styles.gameContainer}>
-      <View style={styles.hud}>
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={styles.hudText}>⏱ {Math.ceil(timeLeft)}s</Text>
         <Text style={styles.hudText}>Score: {score}</Text>
         <Text style={[styles.comboText, combo > 5 && { color: colors.secondary }]}>
@@ -245,7 +247,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -279,7 +280,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: spacing.md,
-    paddingTop: 48,
   },
   hudText: {
     color: colors.text,

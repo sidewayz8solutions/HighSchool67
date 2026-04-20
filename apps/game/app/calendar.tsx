@@ -28,6 +28,7 @@ import {
 } from '@repo/game-engine/world-events';
 import { getAtmosphereDescription } from '@repo/game-engine/atmosphere';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const DAY_CELL_SIZE = (width - spacing.lg * 2 - spacing.sm * 6) / 7;
@@ -57,6 +58,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export default function CalendarScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const progress = useGameStore((s) => s.progress);
   const atmosphere = useGameStore((s) => s.atmosphere);
@@ -98,7 +100,7 @@ export default function CalendarScreen() {
       style={styles.gradientBg}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -407,7 +409,6 @@ const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
   container: {
     padding: spacing.lg,
-    paddingTop: 60,
   },
   header: {
     marginBottom: spacing.md,

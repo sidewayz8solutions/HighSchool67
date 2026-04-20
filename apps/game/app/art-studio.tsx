@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, { FadeIn, BounceIn, FadeOut } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLOR_PALETTE = [
   { name: 'Crimson', hex: '#ef4444' },
@@ -29,6 +30,7 @@ function generateRound(): Round {
 }
 
 export default function ArtStudioScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -104,7 +106,7 @@ export default function ArtStudioScreen() {
 
   if (!started || gameOver) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.title}>Art Studio</Text>
         <Text style={styles.subtitle}>Match colors fast. The quicker you are, the more points you earn.</Text>
         <Card style={styles.card}>
@@ -122,8 +124,8 @@ export default function ArtStudioScreen() {
   }
 
   return (
-    <View style={styles.gameContainer}>
-      <View style={styles.hud}>
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={styles.hudText}>Round {round + 1}/{TOTAL_ROUNDS}</Text>
         <Text style={styles.hudText}>Score: {score}</Text>
       </View>
@@ -184,7 +186,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -214,7 +215,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
   },
   hud: {
     flexDirection: 'row',

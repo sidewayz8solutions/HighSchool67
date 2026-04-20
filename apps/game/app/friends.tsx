@@ -8,28 +8,31 @@ import {
   Modal,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Card, colors, spacing } from '@repo/ui';
 import {
-  MOCK_FRIENDS,
   generateFriendCode,
-  addFriendByCode,
-  removeFriend,
   compareStats,
   getMockPlayerFromFriend,
   useGameStore,
 } from '@repo/game-engine';
 import { NpcAvatar } from '@/components/visuals';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Friend, StatComparison } from '@repo/game-engine';
 
 export default function FriendsScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const player = useGameStore((s) => s.player);
+  const friends = useGameStore((s) => s.friends);
+  const addFriend = useGameStore((s) => s.addFriend);
+  const removeFriendById = useGameStore((s) => s.removeFriendById);
 
-  const [friends, setFriends] = useState<Friend[]>(MOCK_FRIENDS);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [friendCode, setFriendCode] = useState('');
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
@@ -40,15 +43,14 @@ export default function FriendsScreen() {
 
   const handleAddFriend = useCallback(() => {
     if (!friendCode.trim()) return;
-    const result = addFriendByCode(friends, friendCode.trim(), MOCK_FRIENDS);
+    const result = addFriend(friendCode.trim());
     if (result.success && result.friend) {
-      setFriends((prev) => [...prev, result.friend!]);
       setFriendCode('');
       setAddModalVisible(false);
     } else {
       Alert.alert('Error', result.error ?? 'Could not add friend');
     }
-  }, [friendCode, friends]);
+  }, [friendCode, addFriend]);
 
   const handleRemoveFriend = useCallback((friendId: string) => {
     Alert.alert(
@@ -59,11 +61,11 @@ export default function FriendsScreen() {
         {
           text: 'Remove',
           style: 'destructive',
-          onPress: () => setFriends((prev) => removeFriend(prev, friendId)),
+          onPress: () => removeFriendById(friendId),
         },
       ]
     );
-  }, []);
+  }, [removeFriendById]);
 
   const handleViewStats = useCallback((friend: Friend) => {
     const mockPlayer = getMockPlayerFromFriend(friend);
@@ -100,7 +102,7 @@ export default function FriendsScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Friends</Text>
@@ -181,7 +183,10 @@ export default function FriendsScreen() {
 
       {/* Add Friend Modal */}
       <Modal visible={addModalVisible} transparent animationType="slide" onRequestClose={() => setAddModalVisible(false)}>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
           <Card style={styles.modalCard}>
             <Text style={styles.modalTitle}>Add Friend</Text>
             <Text style={styles.modalSubtitle}>Your Friend Code</Text>
@@ -206,7 +211,7 @@ export default function FriendsScreen() {
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
           </Card>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Stats Comparison Modal */}
@@ -269,7 +274,7 @@ export default function FriendsScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

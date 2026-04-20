@@ -6,8 +6,11 @@ import {
   TouchableOpacity,
   TextInput,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, radii, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, {
@@ -129,6 +132,7 @@ function pickRandomWord(diff: Difficulty): WordEntry {
 // ─── Component ──────────────────────────────────────────────────────
 
 export default function WordBlitzScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -300,7 +304,7 @@ export default function WordBlitzScreen() {
 
   if (gameState === 'idle' || gameState === 'gameover') {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Animated.View entering={FadeInUp.duration(400)}>
           <Text style={styles.title}>Word Blitz</Text>
         </Animated.View>
@@ -393,9 +397,13 @@ export default function WordBlitzScreen() {
   // ─── Render: Playing ──────────────────────────────────────────────
 
   return (
-    <View style={styles.gameContainer}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       {/* HUD */}
-      <View style={styles.hud}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={[styles.hudText, { color: colors.warning }]}>
           {totalGameTime}s
         </Text>
@@ -503,6 +511,7 @@ export default function WordBlitzScreen() {
         <Text style={styles.skipText}>Skip Word (-streak)</Text>
       </TouchableOpacity>
     </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -513,7 +522,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -627,7 +635,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
   },
   hud: {
     flexDirection: 'row',

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import { CurrencyBadge } from '@/components/visuals';
@@ -25,6 +26,7 @@ const RARITY_COLORS: Record<string, string> = {
 };
 
 export default function ShopScreen() {
+  const insets = useSafeAreaInsets();
   const currency = useGameStore((s) => s.player.currency);
   const inventory = useGameStore((s) => s.player.inventory);
   const spendCurrency = useGameStore((s) => s.spendCurrency);
@@ -40,7 +42,7 @@ export default function ShopScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Shop</Text>
         <Text style={styles.subtitle}>Decorate your room, boost your stats.</Text>
 
@@ -86,7 +88,7 @@ export default function ShopScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
   subtitle: { fontSize: 16, color: colors.textMuted, marginBottom: spacing.lg },
   currencyRow: { marginBottom: spacing.lg },

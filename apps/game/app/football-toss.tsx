@@ -12,6 +12,7 @@ import Animated, {
   cancelAnimation,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const BALL_SIZE = 48;
@@ -19,6 +20,7 @@ const TARGET_W = 80;
 const TARGET_H = 40;
 
 export default function FootballTossScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -118,7 +120,7 @@ export default function FootballTossScreen() {
 
   if (!started || gameOver) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.title}>Football Toss</Text>
         <Text style={styles.subtitle}>Flick the football into the end zone!</Text>
         <Card style={styles.card}>
@@ -134,7 +136,7 @@ export default function FootballTossScreen() {
   }
 
   return (
-    <GestureHandlerRootView style={styles.gameContainer}>
+    <GestureHandlerRootView style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       <Text style={styles.gameTitle}>Football Toss</Text>
       <Text style={styles.gameSubtitle}>Throw {throws} / 5 • Score: {score}</Text>
 
@@ -158,7 +160,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -188,7 +189,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     alignItems: 'center',
-    paddingTop: 48,
   },
   gameTitle: {
     fontSize: 24,

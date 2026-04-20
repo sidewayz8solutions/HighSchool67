@@ -29,6 +29,13 @@ import type {
   ScheduledEvent,
   SeasonalTheme,
 } from '@repo/types';
+import type { Friend } from './friend-system';
+import {
+  addFriendByCode,
+  removeFriend,
+  sendGift,
+  MOCK_FRIENDS,
+} from './friend-system';
 import { STORY_CHAPTERS, canUnlockChapter, getCurrentScene } from './story';
 import {
   SKILL_TREES,
@@ -377,6 +384,12 @@ interface GameStore extends GameState {
   getCurrentAtmosphere: () => AtmosphereState;
   triggerCrisisEvent: () => ScheduledEvent | null;
   applySeasonalTheme: () => void;
+
+  // Friends
+  friends: Friend[];
+  addFriend: (code: string) => { success: boolean; friend?: Friend; error?: string };
+  removeFriendById: (friendId: string) => void;
+  sendGiftToFriend: (friendId: string, item: RoomItem) => { success: boolean; remainingGifts: number };
 }
 
 export { STORY_CHAPTERS, canUnlockChapter, getCurrentScene };
@@ -458,6 +471,9 @@ export const useGameStore = create<GameStore>()(
       eventHistory: [],
       currentSeasonalTheme: undefined,
 
+      // Friends
+      friends: MOCK_FRIENDS,
+
       // ─── Actions ────────────────────────────────────────────────
 
       initGame: (name, clique, avatarConfig) => {
@@ -477,6 +493,7 @@ export const useGameStore = create<GameStore>()(
           };
           state.purchasedSkillNodes = [];
           state.activeAbilities = ACTIVE_ABILITIES.map((a) => ({ ...a, unlocked: false, currentCooldown: 0 }));
+          state.friends = MOCK_FRIENDS.map((f) => ({ ...f }));
           state.careerPaths = CAREER_PATHS.map((c) => ({
             ...c,
             milestones: c.milestones.map((m) => ({ ...m, completed: false })),
@@ -1088,6 +1105,38 @@ export const useGameStore = create<GameStore>()(
             state.atmosphere = applySeasonalModifiers(state.atmosphere, theme);
           }
         });
+      },
+
+      addFriend: (code) => {
+        const state = get();
+        const result = addFriendByCode(state.friends, code, MOCK_FRIENDS);
+        if (result.success && result.friend) {
+          set((s) => {
+            s.friends.push(result.friend!);
+          });
+          haptics.success();
+        }
+        return result;
+      },
+
+      removeFriendById: (friendId) => {
+        set((state) => {
+          state.friends = removeFriend(state.friends, friendId);
+        });
+        haptics.medium();
+      },
+
+      sendGiftToFriend: (friendId, item) => {
+        const state = get();
+        const friend = state.friends.find((f) => f.id === friendId);
+        if (!friend) return { success: false, remainingGifts: 0 };
+        const result = sendGift(friend, item);
+        set((s) => {
+          const idx = s.friends.findIndex((f) => f.id === friendId);
+          if (idx !== -1) s.friends[idx] = result.updatedFriend;
+        });
+        if (result.remainingGifts >= 0) haptics.success();
+        return { success: true, remainingGifts: result.remainingGifts };
       },
     })),
     {

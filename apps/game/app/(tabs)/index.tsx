@@ -7,6 +7,7 @@ import { useGameStore } from '@repo/game-engine';
 import { AvatarPreview } from '@/components/avatar-preview';
 import { Particles, CurrencyBadge } from '@/components/visuals';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -150,6 +151,7 @@ const GAME_ICONS: Record<string, { gradient: [string, string]; icon: string }> =
 // ─── Main Screen ──────────────────────────────────────────────────
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const player = useGameStore((s) => s.player);
   const progress = useGameStore((s) => s.progress);
@@ -193,7 +195,7 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Particles active={particles} onComplete={() => setParticles(false)} />
 
         {/* Header */}
@@ -418,7 +420,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
 
   // Header
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md, gap: spacing.md },

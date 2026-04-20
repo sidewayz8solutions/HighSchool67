@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing, radii } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, {
@@ -277,6 +278,7 @@ function blocksEqual(a: CodeBlock[], b: CodeBlock[]): boolean {
 // ─── Component ──────────────────────────────────────────────────────
 
 export default function CodingChallengeScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -446,7 +448,7 @@ export default function CodingChallengeScreen() {
 
   if (gameState === 'idle' || gameState === 'gameover') {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Animated.View entering={FadeInUp.duration(400)}>
           <Text style={styles.title}>Code Challenge</Text>
         </Animated.View>
@@ -500,9 +502,9 @@ export default function CodingChallengeScreen() {
   // ─── Render: Playing ──────────────────────────────────────────────
 
   return (
-    <View style={styles.gameContainer}>
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       {/* HUD */}
-      <View style={styles.hud}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={styles.hudPuzzle}>
           Puzzle {currentPuzzleIndex + 1}/{shuffledPuzzles.length}
         </Text>
@@ -632,7 +634,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -707,7 +708,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
   },
   hud: {
     flexDirection: 'row',

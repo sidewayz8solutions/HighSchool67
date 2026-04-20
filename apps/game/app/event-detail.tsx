@@ -7,6 +7,7 @@ import { useGameStore } from '@repo/game-engine';
 import { SCHEDULED_EVENTS, canParticipateInEvent, getEventConsequences } from '@repo/game-engine/world-events';
 import { formatGameDate } from '@repo/game-engine/event-calendar';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CATEGORY_COLORS: Record<string, string> = {
   academic: colors.primary,
@@ -49,6 +50,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 export default function EventDetailScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const player = useGameStore((s) => s.player);
@@ -107,7 +109,7 @@ export default function EventDetailScreen() {
       style={styles.gradientBg}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Back Button */}
@@ -417,7 +419,6 @@ const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
   container: {
     padding: spacing.lg,
-    paddingTop: 60,
   },
   errorContainer: {
     flex: 1,

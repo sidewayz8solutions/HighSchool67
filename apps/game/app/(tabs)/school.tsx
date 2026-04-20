@@ -6,8 +6,10 @@ import { Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import { NpcAvatar, Particles } from '@/components/visuals';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SchoolScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const npcs = useGameStore((s) => s.npcs);
   const changeNPCRelationship = useGameStore((s) => s.changeNPCRelationship);
@@ -38,7 +40,7 @@ export default function SchoolScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Particles active={particles} onComplete={() => setParticles(false)} />
 
         <Text style={styles.title}>School Hallways</Text>
@@ -111,7 +113,6 @@ const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
   container: {
     padding: spacing.lg,
-    paddingTop: 60,
   },
   title: {
     fontSize: 28,

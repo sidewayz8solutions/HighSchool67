@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import { generateDialogue } from '@repo/ai';
 
 export default function AIDialogueScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { npcId } = useLocalSearchParams<{ npcId: string }>();
   const npc = useGameStore((s) => s.npcs.find((n) => n.id === npcId));
@@ -64,7 +66,7 @@ export default function AIDialogueScreen() {
 
   if (!npc) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.error}>NPC not found.</Text>
         <Button title="Go Back" onPress={() => router.back()} />
       </View>
@@ -72,7 +74,7 @@ export default function AIDialogueScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       <Text style={styles.title}>AI Conversation</Text>
       <Text style={styles.subtitle}>You bump into {npc.name} {npc.avatar} in the hallway.</Text>
 
@@ -103,7 +105,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {

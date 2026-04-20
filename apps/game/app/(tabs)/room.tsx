@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import RoomGridEditor from '@/components/room-grid';
@@ -23,6 +24,7 @@ const FLOOR_TYPES = [
 ];
 
 export default function RoomScreen() {
+  const insets = useSafeAreaInsets();
   const room = useGameStore((s) => s.player.room);
 
   const setWallColor = (hex: string) => {
@@ -35,7 +37,7 @@ export default function RoomScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>My Room</Text>
         <Text style={styles.subtitle}>Customize your space to match your vibe.</Text>
 
@@ -101,7 +103,7 @@ export default function RoomScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
   subtitle: { fontSize: 16, color: colors.textMuted, marginBottom: spacing.lg },
   sectionTitle: { fontSize: 14, fontWeight: '700', color: colors.textSecondary, marginBottom: spacing.sm, marginTop: spacing.lg, textTransform: 'uppercase', letterSpacing: 1 },

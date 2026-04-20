@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, radii, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 
@@ -43,6 +44,7 @@ function generateQuestion(): Question {
 }
 
 export default function MathBlitzScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -99,7 +101,7 @@ export default function MathBlitzScreen() {
 
   if (!started || gameOver) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.title}>Math Blitz</Text>
         <Text style={styles.subtitle}>Answer as many math questions as you can in 30 seconds!</Text>
         <Card style={styles.card}>
@@ -115,7 +117,7 @@ export default function MathBlitzScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       <View style={styles.header}>
         <Text style={styles.timer}>⏱ {timeLeft}s</Text>
         <Text style={styles.score}>Score: {score}</Text>
@@ -141,7 +143,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {

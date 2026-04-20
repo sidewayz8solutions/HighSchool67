@@ -3,21 +3,24 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { colors } from '@repo/ui';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   return (
-    <ErrorBoundary>
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="index" options={{ title: 'HIGH SCHOOL 67', headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-      <StatusBar style="light" />
-    </ErrorBoundary>
+    <SafeAreaProvider>
+      <ErrorBoundary>
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="index" options={{ title: 'HIGH SCHOOL 67', headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+        <StatusBar style="light" />
+      </ErrorBoundary>
+    </SafeAreaProvider>
   );
 }

@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import { STORY_CHAPTERS } from '@repo/game-engine';
@@ -25,12 +26,13 @@ const CHAPTER_ICONS: Record<string, { gradient: [string, string]; letter: string
 };
 
 export default function StoryScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { storyProgress, progress, player, getChapterStatus } = useGameStore();
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Story</Text>
         <Text style={styles.subtitle}>Your choices shape your legacy.</Text>
 
@@ -86,7 +88,7 @@ export default function StoryScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
   subtitle: { fontSize: 16, color: colors.textMuted, marginBottom: spacing.lg },
   card: { marginBottom: spacing.md },

@@ -15,6 +15,7 @@ import {
 } from '@repo/game-engine';
 import { NpcAvatar } from '@/components/visuals';
 import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { LeaderboardEntry } from '@repo/game-engine';
 
 const GAME_TYPE_EMOJI: Record<string, string> = {
@@ -80,6 +81,7 @@ function PodiumEntry({
 }
 
 export default function LeaderboardScreen() {
+  const insets = useSafeAreaInsets();
   const player = useGameStore((s) => s.player);
 
   const [selectedGame, setSelectedGame] = useState<string>(GAME_TYPES[0]);
@@ -131,7 +133,7 @@ export default function LeaderboardScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Leaderboard</Text>
         <Text style={styles.subtitle}>The best of the best. Where do you rank?</Text>
 
@@ -231,7 +233,7 @@ export default function LeaderboardScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
   subtitle: { fontSize: 16, color: colors.textMuted, marginBottom: spacing.lg },
   filterRow: {

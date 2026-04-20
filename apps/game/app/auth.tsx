@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { useAuth } from '@/hooks/use-auth';
 
 export default function AuthScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, loading, signUp, signIn, signInAnonymous } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -23,7 +25,7 @@ export default function AuthScreen() {
 
   if (user) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Text style={styles.title}>You&apos;re Signed In!</Text>
         <Card style={styles.card}>
           <Text style={styles.label}>User ID</Text>
@@ -69,7 +71,11 @@ export default function AuthScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       <Text style={styles.title}>Cloud Save</Text>
       <Text style={styles.subtitle}>Sign in to sync your progress across devices.</Text>
 
@@ -135,6 +141,7 @@ export default function AuthScreen() {
 
       <Button title="Back" variant="ghost" onPress={() => router.back()} />
     </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -143,7 +150,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
   },
   title: {
     fontSize: 28,

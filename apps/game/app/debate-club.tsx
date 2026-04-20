@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing, radii } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, {
@@ -264,6 +265,7 @@ const CROWD_REACTIONS = {
 // ─── Component ──────────────────────────────────────────────────────
 
 export default function DebateClubScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const spendEnergy = useGameStore((s) => s.spendEnergy);
   const addCurrency = useGameStore((s) => s.addCurrency);
@@ -386,7 +388,7 @@ export default function DebateClubScreen() {
 
   if (gameState === 'idle' || gameState === 'gameover') {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Animated.View entering={FadeInUp.duration(400)}>
           <Text style={styles.title}>Debate Club</Text>
         </Animated.View>
@@ -436,9 +438,9 @@ export default function DebateClubScreen() {
   // ─── Render: Playing ──────────────────────────────────────────────
 
   return (
-    <View style={styles.gameContainer}>
+    <View style={[styles.gameContainer, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       {/* HUD */}
-      <View style={styles.hud}>
+      <View style={[styles.hud, { paddingTop: Math.max(insets.top, 16) + 8 }]}>
         <Text style={styles.hudRound}>
           Round {currentRound + 1}/{ROUNDS_PER_GAME}
         </Text>
@@ -553,7 +555,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
     alignItems: 'center',
   },
   title: {
@@ -634,7 +635,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: spacing.md,
-    paddingTop: 48,
   },
   hud: {
     flexDirection: 'row',

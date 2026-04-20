@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -171,6 +172,7 @@ function NodeDetailSheet({
   treeColor: string;
   canAfford: boolean;
 }) {
+  const insets = useSafeAreaInsets();
   if (!node) return null;
 
   const hasStatBonus = node.effects.statBonus && Object.keys(node.effects.statBonus).length > 0;
@@ -183,7 +185,7 @@ function NodeDetailSheet({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
+      <View style={[styles.modalOverlay, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
         <Animated.View entering={FadeInUp.duration(300)} style={styles.modalContent}>
           <LinearGradient
             colors={[colors.surface, colors.surfaceHighlight]}
@@ -281,6 +283,7 @@ function NodeDetailSheet({
 // ─── Skill Tree Screen ──────────────────────────────────────────────
 
 export default function SkillTreeScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<SkillTreeId>('academics');
   const [selectedNode, setSelectedNode] = useState<SkillNode | null>(null);
@@ -331,13 +334,13 @@ export default function SkillTreeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
       {/* Header */}
       <LinearGradient
         colors={treeColors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.headerGradient}
+        style={[styles.headerGradient, { paddingTop: Math.max(insets.top, 16) + 12 }]}
       >
         <View style={styles.headerContent}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -481,7 +484,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   headerGradient: {
-    paddingTop: 48,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
   },

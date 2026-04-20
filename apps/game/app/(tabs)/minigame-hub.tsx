@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
 import Animated, {
@@ -211,6 +212,7 @@ function GameCard({ game, index }: { game: MiniGame; index: number }) {
 // ─── Main Screen ──────────────────────────────────────────────────
 
 export default function MiniGameHubScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const playerStats = useGameStore((s) => s.player.stats);
@@ -225,7 +227,7 @@ export default function MiniGameHubScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         {/* Header with gradient text */}
         <Animated.View entering={FadeInUp.duration(400)}>
           <LinearGradient
@@ -359,7 +361,7 @@ export default function MiniGameHubScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
 
   titleGradient: {
     alignSelf: 'flex-start',

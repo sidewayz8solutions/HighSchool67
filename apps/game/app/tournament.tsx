@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Card, colors, spacing } from '@repo/ui';
 import {
   GAME_TYPES,
@@ -92,6 +93,7 @@ function RewardRow({ reward, isHighlighted }: { reward: TournamentReward; isHigh
 }
 
 export default function TournamentScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const player = useGameStore((s) => s.player);
 
@@ -131,7 +133,7 @@ export default function TournamentScreen() {
 
   return (
     <LinearGradient colors={colors.gradientDark } style={styles.gradientBg}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Tournament Hub</Text>
         <Text style={styles.subtitle}>Compete weekly for glory and rewards.</Text>
 
@@ -272,7 +274,7 @@ export default function TournamentScreen() {
 
 const styles = StyleSheet.create({
   gradientBg: { flex: 1 },
-  container: { padding: spacing.lg, paddingTop: 60 },
+  container: { padding: spacing.lg },
   title: { fontSize: 28, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
   subtitle: { fontSize: 16, color: colors.textMuted, marginBottom: spacing.lg },
   bannerCard: { marginBottom: spacing.lg },
