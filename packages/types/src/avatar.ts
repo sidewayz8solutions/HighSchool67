@@ -36,6 +36,7 @@ export const HAIR_STYLES = [
   { name: 'Bun', icon: '🍡' },
   { name: 'Ponytail', icon: '🎀' },
   { name: 'Mohawk', icon: '🦔' },
+  { name: 'Mullet', icon: '🎸' },
 ];
 
 export const OUTFITS = [

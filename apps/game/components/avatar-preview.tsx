@@ -33,8 +33,9 @@ const TOP_MAP: Record<number, string[]> = {
   3: ['dreads01'],          // Braids — dreadlock variant closest to braids
   4: [],                    // Bald — no top
   5: ['bun'],               // Bun — hair tied up
-  6: ['straight01'],        // Ponytail — long straight, closest vibe
-  7: ['shavedSides'],       // Mohawk — shaved sides, longer top
+  6: ['straightAndStrand'], // Ponytail — straight with a loose strand, pulled-back vibe
+  7: ['shavedSides'],       // Mohawk — shaved sides, longer top (closest available)
+  8: ['shaggyMullet'],      // Mullet — shaggy mullet style
 };
 
 const CLOTHING_MAP: Record<number, { clothing: string[]; graphic?: string[] }> = {
@@ -68,6 +69,7 @@ const EYES_MAP: Record<number, string[]> = {
   5: ['surprised'],
   6: ['hearts'],
   7: ['default'],
+  8: ['eyeRoll'],
 };
 
 function hexToDiceBear(hex: string): string[] {
@@ -123,7 +125,7 @@ function recolorEyes(svg: string, eyeColor: string): string {
 
   let newEyeContent = eyeContent;
   if (!hasWhiteSclera) {
-    newEyeContent = `<circle cx="30" cy="22" r="9" fill="#fff"/><circle cx="82" cy="22" r="9" fill="#fff"/>` + newEyeContent;
+    newEyeContent = `<ellipse cx="30" cy="22" rx="10" ry="7" fill="#fff"/><ellipse cx="82" cy="22" rx="10" ry="7" fill="#fff"/>` + newEyeContent;
   }
 
   // Recolor the iris/pupil shapes to the chosen eye color
