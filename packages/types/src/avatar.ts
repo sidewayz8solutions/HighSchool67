@@ -34,7 +34,7 @@ export const HAIR_STYLES = [
   { name: 'Braids', icon: '🧬' },
   { name: 'Bald', icon: '👤' },
   { name: 'Bun', icon: '🍡' },
-  { name: 'Ponytail', icon: '🎀' },
+  { name: 'Pigtails', icon: '🎀' },
   { name: 'Mohawk', icon: '🦔' },
   { name: 'Mullet', icon: '🎸' },
 ];

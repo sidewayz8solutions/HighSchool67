@@ -33,7 +33,7 @@ const TOP_MAP: Record<number, string[]> = {
   3: ['dreads01'],          // Braids — dreadlock variant closest to braids
   4: [],                    // Bald — no top
   5: ['bun'],               // Bun — hair tied up
-  6: ['straightAndStrand'], // Ponytail — straight with a loose strand, pulled-back vibe
+  6: ['frida'],             // Pigtails — braided hair hanging on both sides
   7: ['shavedSides'],       // Mohawk — shaved sides, longer top (closest available)
   8: ['shaggyMullet'],      // Mullet — shaggy mullet style
 };
@@ -120,12 +120,15 @@ function recolorEyes(svg: string, eyeColor: string): string {
   const innerEnd = eyeGroupFull.lastIndexOf('</g>');
   const eyeContent = eyeGroupFull.substring(innerStart, innerEnd);
 
-  // If the eye variant doesn't already have a white sclera, add one
+  // If the eye variant doesn't already have a white sclera, add almond-shaped whites
   const hasWhiteSclera = eyeContent.includes('fill="#fff"');
 
   let newEyeContent = eyeContent;
   if (!hasWhiteSclera) {
-    newEyeContent = `<ellipse cx="30" cy="22" rx="10" ry="7" fill="#fff"/><ellipse cx="82" cy="22" rx="10" ry="7" fill="#fff"/>` + newEyeContent;
+    // Almond-shaped white sclera that frames the iris naturally
+    const leftAlmond = '<path d="M24 22Q30 18 36 22Q30 26 24 22Z" fill="#fff"/>';
+    const rightAlmond = '<path d="M76 22Q82 18 88 22Q82 26 76 22Z" fill="#fff"/>';
+    newEyeContent = leftAlmond + rightAlmond + newEyeContent;
   }
 
   // Recolor the iris/pupil shapes to the chosen eye color
