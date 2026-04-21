@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Card, Button, colors, spacing } from '@repo/ui';
 import { useGameStore, STORY_CHAPTERS, getCurrentScene } from '@repo/game-engine';
-import { generateDialogue } from '@repo/ai';
+import { generateDialogueFromApi } from '@/services/ai';
 import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { StoryChoice } from '@repo/types';
@@ -37,18 +37,15 @@ export default function StoryChapterScreen() {
     async function fetchAi() {
       setLoading(true);
       try {
-        const text = await generateDialogue(
-          {
-            playerName: player.name,
-            clique: player.clique,
-            npcName: 'Narrator',
-            npcClique: 'neutral',
-            relationship: 50,
-            currentScene: currentScene!.text,
-          },
-          process.env.EXPO_PUBLIC_OPENAI_API_KEY
-        );
-        if (!cancelled) setAiText(text);
+        const text = await generateDialogueFromApi({
+          playerName: player.name,
+          clique: player.clique,
+          npcName: 'Narrator',
+          npcClique: 'neutral',
+          relationship: 50,
+          currentScene: currentScene!.text,
+        });
+        if (!cancelled) setAiText(text ?? currentScene!.text);
       } catch {
         if (!cancelled) setAiText(currentScene!.text);
       } finally {

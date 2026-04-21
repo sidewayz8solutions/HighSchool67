@@ -154,12 +154,24 @@ export function hasVIPOrHigher(customerInfo: CustomerInfo | null): boolean {
   );
 }
 
-// Mock purchase for development / web
-export async function mockPurchase(tierId: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Mock purchase completed for', tierId);
-      resolve(true);
-    }, 1500);
-  });
+export async function createWebCheckoutSession(tierId: string): Promise<string | null> {
+  const endpoint = process.env.EXPO_PUBLIC_STRIPE_CHECKOUT_ENDPOINT?.trim();
+  if (!endpoint) {
+    console.warn('Stripe checkout endpoint not configured');
+    return null;
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ tierId }),
+    });
+    if (!response.ok) return null;
+    const data = (await response.json()) as { checkoutUrl?: string };
+    return data.checkoutUrl?.trim() || null;
+  } catch (e) {
+    console.error('Failed to create Stripe checkout session:', e);
+    return null;
+  }
 }

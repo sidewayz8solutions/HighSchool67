@@ -390,6 +390,7 @@ interface GameStore extends GameState {
   addFriend: (code: string) => { success: boolean; friend?: Friend; error?: string };
   removeFriendById: (friendId: string) => void;
   sendGiftToFriend: (friendId: string, item: RoomItem) => { success: boolean; remainingGifts: number };
+  hydrateFromCloud: (cloudState: Partial<GameState>) => void;
 }
 
 export { STORY_CHAPTERS, canUnlockChapter, getCurrentScene };
@@ -1137,6 +1138,19 @@ export const useGameStore = create<GameStore>()(
         });
         if (result.remainingGifts >= 0) haptics.success();
         return { success: true, remainingGifts: result.remainingGifts };
+      },
+
+      hydrateFromCloud: (cloudState) => {
+        set((state) => {
+          if (cloudState.player) state.player = cloudState.player;
+          if (cloudState.progress) state.progress = cloudState.progress;
+          if (cloudState.npcs) state.npcs = cloudState.npcs;
+          if (cloudState.rivals) state.rivals = cloudState.rivals;
+          if (cloudState.challenges) state.challenges = cloudState.challenges;
+          if (cloudState.achievements) state.achievements = cloudState.achievements;
+          if (cloudState.storyProgress) state.storyProgress = cloudState.storyProgress;
+          if (cloudState.lastPlayedAt) state.lastPlayedAt = cloudState.lastPlayedAt;
+        });
       },
     })),
     {

@@ -9,7 +9,7 @@ import {
   getCustomerInfo,
   hasAnyPass,
   hasVIPOrHigher,
-  mockPurchase,
+  createWebCheckoutSession,
   DEFAULT_TIERS,
   type PurchaseTier,
 } from '@/services/purchases';
@@ -51,14 +51,13 @@ export function usePurchases(): UsePurchasesReturn {
       setPurchasing(true);
       try {
         if (Platform.OS === 'web') {
-          // On web, use mock purchase for now (Stripe integration would go here)
-          const success = await mockPurchase(tierId);
-          if (success) {
-            // In production, this would validate via webhook
-            const info = await getCustomerInfo();
-            setCustomerInfo(info);
+          const checkoutUrl = await createWebCheckoutSession(tierId);
+          if (!checkoutUrl) return false;
+          if (typeof window !== 'undefined') {
+            window.location.assign(checkoutUrl);
+            return true;
           }
-          return success;
+          return false;
         }
 
         const tier = DEFAULT_TIERS.find((t) => t.id === tierId);

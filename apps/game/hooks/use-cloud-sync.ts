@@ -73,14 +73,8 @@ export function useCloudSync(): UseCloudSyncReturn {
       return false;
     }
 
-    // Merge cloud state into local store
-    const store = useGameStore.getState();
-    if (cloudState.player) store.player = cloudState.player;
-    if (cloudState.progress) store.progress = cloudState.progress;
-    if (cloudState.npcs) store.npcs = cloudState.npcs;
-    if (cloudState.challenges) store.challenges = cloudState.challenges;
-    if (cloudState.storyProgress) store.storyProgress = cloudState.storyProgress;
-    if (cloudState.lastPlayedAt) store.lastPlayedAt = cloudState.lastPlayedAt;
+    // Merge cloud state through a store action so Zustand reactivity/persist stays consistent.
+    useGameStore.getState().hydrateFromCloud(cloudState);
 
     setLastSync(new Date().toISOString());
     setSyncing(false);

@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, colors, spacing } from '@repo/ui';
 import { useGameStore } from '@repo/game-engine';
-import { generateDialogue } from '@repo/ai';
+import { generateDialogueFromApi } from '@/services/ai';
 
 export default function AIDialogueScreen() {
   const insets = useSafeAreaInsets();
@@ -29,17 +29,17 @@ export default function AIDialogueScreen() {
       if (!npc) return;
       setLoading(true);
       try {
-        const text = await generateDialogue({
+        const text = await generateDialogueFromApi({
           playerName: player.name,
           clique: player.clique,
           npcName: npc.name,
           npcClique: npc.clique,
           relationship: npc.relationship,
           currentScene: 'hallway between classes',
-        }, process.env.EXPO_PUBLIC_OPENAI_API_KEY);
+        });
 
         if (!cancelled) {
-          setDialogue(text);
+          setDialogue(text ?? `${npc.name} smiles. "Hey ${player.name}, good to see you."`);
           changeNPCRelationship(npc.id, 3, 'friendship');
           updateChallenge('c2', 1);
         }

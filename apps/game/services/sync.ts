@@ -13,6 +13,31 @@ export interface CloudSave {
   device_id?: string;
 }
 
+type CloudSaveRow = {
+  player: GameState['player'];
+  progress: GameState['progress'];
+  npcs: GameState['npcs'];
+  challenges: GameState['challenges'];
+  story_progress: StoryProgress;
+  last_synced_at: string;
+};
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isValidCloudSaveRow(data: unknown): data is CloudSaveRow {
+  if (!isObject(data)) return false;
+  return (
+    isObject(data.player) &&
+    isObject(data.progress) &&
+    Array.isArray(data.npcs) &&
+    Array.isArray(data.challenges) &&
+    isObject(data.story_progress) &&
+    typeof data.last_synced_at === 'string'
+  );
+}
+
 export async function saveGameState(userId: string, state: GameState): Promise<boolean> {
   try {
     const saveData: CloudSave = {
@@ -55,6 +80,10 @@ export async function loadGameState(userId: string): Promise<Partial<GameState> 
     }
 
     if (!data) return null;
+    if (!isValidCloudSaveRow(data)) {
+      console.warn('Cloud load returned invalid save shape');
+      return null;
+    }
 
     return {
       player: data.player,

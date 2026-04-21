@@ -53,11 +53,11 @@ pnpm --filter game android
 
 ## Environment Setup
 
-Create `apps/game/.env` with your keys:
+Create `apps/game/.env` with your keys/endpoints:
 
 ```
-# OpenAI API Key for AI-powered NPC dialogue
-EXPO_PUBLIC_OPENAI_API_KEY=sk-...
+# AI dialogue backend endpoint (OpenAI key stays on server)
+EXPO_PUBLIC_AI_DIALOGUE_ENDPOINT=https://your-api.example.com/dialogue
 
 # Supabase (cloud save + auth)
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -66,6 +66,9 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 # RevenueCat (monetization)
 EXPO_PUBLIC_REVENUECAT_IOS_KEY=your_ios_key
 EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=your_android_key
+
+# Stripe checkout session endpoint (web purchases)
+EXPO_PUBLIC_STRIPE_CHECKOUT_ENDPOINT=https://your-api.example.com/payments/create-checkout-session
 ```
 
 ## Supabase Setup (Cloud Save)

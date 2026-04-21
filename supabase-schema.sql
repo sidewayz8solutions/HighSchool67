@@ -64,3 +64,31 @@ create trigger update_game_saves_updated_at
 
 -- Index for faster lookups by user_id
 create index if not exists idx_game_saves_user_id on game_saves(user_id);
+
+-- Stripe webhook idempotency table
+create table if not exists stripe_events (
+  id text primary key,
+  type text not null,
+  created_at timestamp with time zone default now()
+);
+
+-- User entitlements sourced from Stripe/RevenueCat
+create table if not exists entitlements (
+  user_id uuid references auth.users(id) on delete cascade not null,
+  entitlement_id text not null,
+  status text not null check (status in ('active', 'inactive')),
+  source text not null check (source in ('stripe', 'revenuecat')),
+  expires_at timestamp with time zone null,
+  updated_at timestamp with time zone default now(),
+  created_at timestamp with time zone default now(),
+  primary key (user_id, entitlement_id)
+);
+
+alter table entitlements enable row level security;
+
+create policy "Users can read own entitlements"
+  on entitlements
+  for select
+  using (auth.uid() = user_id);
+
+create index if not exists idx_entitlements_user_id on entitlements(user_id);
