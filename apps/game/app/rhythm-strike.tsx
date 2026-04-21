@@ -73,6 +73,7 @@ export default function RhythmStrikeScreen() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [feedbackColor, setFeedbackColor] = useState(colors.success);
   const [laneGlows, setLaneGlows] = useState<boolean[]>([false, false, false, false]);
+  const [laneHeight, setLaneHeight] = useState(600);
 
   const noteIdCounter = useRef(0);
   const startTimeRef = useRef(0);
@@ -157,6 +158,9 @@ export default function RhythmStrikeScreen() {
   useEffect(() => {
     if (gameState !== 'playing') return;
 
+    const hitZoneY = laneHeight - 80 - (NOTE_SIZE + 8) / 2;
+    const missThreshold = hitZoneY + 60;
+
     const interval = setInterval(() => {
       const elapsed = SONG_DURATION - timeLeft;
 
@@ -166,10 +170,10 @@ export default function RhythmStrikeScreen() {
           // Calculate Y position based on time until target
           const timeUntilHit = note.spawnTime - elapsed;
           const progress = 1 - (timeUntilHit / FALL_DURATION);
-          const newY = interpolate(progress, [0, 1], [-NOTE_SIZE, 420], 'clamp');
+          const newY = interpolate(progress, [0, 1], [-NOTE_SIZE, hitZoneY + 100], 'clamp');
 
           // Check if missed (passed the hit zone)
-          if (newY > 440 && !note.missed && !note.hit) {
+          if (newY > missThreshold && !note.missed && !note.hit) {
             return { ...note, missed: true, y: newY };
           }
 
@@ -213,7 +217,7 @@ export default function RhythmStrikeScreen() {
     if (gameState !== 'playing') return;
 
     const elapsed = SONG_DURATION - timeLeft;
-    const hitZoneY = 400;
+    const hitZoneY = laneHeight - 80 - (NOTE_SIZE + 8) / 2;
     const tolerance = 50;
 
     // Find the closest note in this lane
@@ -286,6 +290,7 @@ export default function RhythmStrikeScreen() {
   };
 
   const song = SONGS.find((s) => s.label === selectedSong) ?? SONGS[1];
+  const renderHitZoneY = laneHeight - 80 - (NOTE_SIZE + 8) / 2;
 
   // ─── Render: Idle / Game Over ─────────────────────────────────────
 
@@ -418,6 +423,9 @@ export default function RhythmStrikeScreen() {
         {Array.from({ length: LANE_COUNT }).map((_, lane) => (
           <View
             key={lane}
+            onLayout={(e) => {
+              if (lane === 0) setLaneHeight(e.nativeEvent.layout.height);
+            }}
             style={[
               styles.lane,
               { backgroundColor: laneGlows[lane] ? `${LANE_COLORS[lane]}40` : `${LANE_COLORS[lane]}10` },
@@ -442,7 +450,7 @@ export default function RhythmStrikeScreen() {
                       left: (LANE_WIDTH - NOTE_SIZE) / 2,
                       opacity: interpolate(
                         note.y,
-                        [-NOTE_SIZE, 0, 400, 450],
+                        [-NOTE_SIZE, 0, renderHitZoneY, renderHitZoneY + 80],
                         [0.3, 1, 1, 0.3],
                         'clamp'
                       ),

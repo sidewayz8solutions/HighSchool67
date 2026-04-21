@@ -20,6 +20,8 @@ export default function AIDialogueScreen() {
   const [dialogue, setDialogue] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
+  const apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
+
   useEffect(() => {
     if (!npc) return;
 
@@ -63,6 +65,19 @@ export default function AIDialogueScreen() {
       cancelled = true;
     };
   }, [npc, player]);
+
+  if (!apiKey || apiKey.startsWith('sk-your') || apiKey.startsWith('sk-...')) {
+    return (
+      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + 12 }]}>
+        <Text style={styles.title}>AI Conversation</Text>
+        <Text style={styles.error}>
+          AI Chat requires an OpenAI API key.{'\n'}
+          Please configure EXPO_PUBLIC_OPENAI_API_KEY in your .env file.
+        </Text>
+        <Button title="Go Back" onPress={() => router.back()} />
+      </View>
+    );
+  }
 
   if (!npc) {
     return (

@@ -204,10 +204,10 @@ export default function HomeScreen() {
           <View style={styles.headerText}>
             <Text style={styles.greeting}>{player.name}</Text>
             <Text style={styles.subtitle}>
-              {player.clique.charAt(0).toUpperCase() + player.clique.slice(1)} • Semester {progress.semester} • Day {progress.day}
+              {player.clique ? player.clique.charAt(0).toUpperCase() + player.clique.slice(1) : 'Student'} • Semester {progress?.semester ?? 1} • Day {progress?.day ?? 1}
             </Text>
             <View style={styles.periodBadge}>
-              <Text style={styles.periodText}>{progress.period.toUpperCase()}</Text>
+              <Text style={styles.periodText}>{(progress?.period ?? 'morning').toUpperCase()}</Text>
             </View>
           </View>
         </View>
